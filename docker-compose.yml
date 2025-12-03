@@ -11,7 +11,6 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      # Pasta de scripts de inicialização (schema, etc.)
       - ./sql:/docker-entrypoint-initdb.d:ro
 
   api:
@@ -49,6 +48,19 @@ services:
       - "8002:80"
     volumes:
       - ./dashboards:/var/www/html
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: reforma_phpmyadmin
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 512M
+    ports:
+      - "8080:80"
 
 volumes:
   db_data:
