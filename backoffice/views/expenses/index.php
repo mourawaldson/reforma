@@ -44,6 +44,23 @@ $(function() {
         return 'R$ ' + intPart + ',' + decPart;
     }
 
+    // converte 'YYYY-MM-DD' -> 'DD/MM/YYYY'
+    function formatDateBR(isoDate) {
+        if (!isoDate) return '';
+        const [y, m, d] = isoDate.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    // suporte ao formato DD/MM/YYYY para ordenação (date-eu)
+    $.extend($.fn.dataTable.ext.type.order, {
+        "date-eu-pre": function (date) {
+            if (!date) return 0;
+            const parts = date.split('/');
+            if (parts.length !== 3) return 0;
+            return parseInt(parts[2] + parts[1] + parts[0], 10); // yyyymmdd
+        }
+    });
+
     function loadExpenses() {
         const year = $('#filter-year').val();
 
@@ -61,7 +78,7 @@ $(function() {
             // Totais por fornecedor
             const supplierTotals = {}; // { nomeFornecedor: { paid: x, nf: y } }
 
-            let html = '<div class="table-responsive"><table class="table table-sm table-striped align-middle"><thead><tr>';
+            let html = '<div class="table-responsive"><table id="expenses-table" class="table table-sm table-striped align-middle"><thead><tr>';
             html += '<th>Data</th><th>Categoria</th><th>Fornecedor</th><th>Descrição</th><th class="text-end">NF</th><th class="text-end">Pago</th><th>Tags</th><th></th>';
             html += '</tr></thead><tbody>';
 
@@ -82,13 +99,14 @@ $(function() {
                 const tags = (e.tags || []).map(t => '<span class="badge bg-secondary me-1">'+t.name+'</span>').join('');
 
                 const description = e.description || '';
+                const descriptionTitle = description.replace(/"/g, '&quot;');
 
                 html += '<tr>';
-                html += '<td>'+e.date+'</td>';
+                html += '<td>'+formatDateBR(e.date)+'</td>';
                 html += '<td>'+(e.category_name || '')+'</td>';
                 html += '<td>'+(e.supplier_name || '')+'</td>';
                 // descrição truncada por CSS, texto completo no title
-                html += '<td class="descricao-coluna" title="'+description.replace(/"/g, '&quot;')+'">'+description+'</td>';
+                html += '<td class="descricao-coluna" title="'+descriptionTitle+'">'+description+'</td>';
                 html += '<td class="text-end">'+(e.amount_nf !== null ? formatCurrencyBRFromNumber(e.amount_nf) : '')+'</td>';
                 html += '<td class="text-end">'+formatCurrencyBRFromNumber(e.amount_paid)+'</td>';
                 html += '<td>'+tags+'</td>';
@@ -106,7 +124,25 @@ $(function() {
             html += '</tr>';
             html += '</tfoot></table></div>';
 
+            // Se já existe uma DataTable anterior, destrói antes de recriar
+            if ($.fn.DataTable.isDataTable('#expenses-table')) {
+                $('#expenses-table').DataTable().destroy();
+            }
+
             $('#expenses-table-wrapper').html(html);
+
+            // Inicializa DataTables com paginação, ordenação e pt-BR
+            $('#expenses-table').DataTable({
+                order: [],
+                pageLength: 50,
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+                },
+                columnDefs: [
+                    { targets: 0, type: 'date-eu' },   // coluna Data
+                    { targets: [4, 5], className: 'text-end' } // garante alinhamento de NF / Pago
+                ]
+            });
 
             // ---- Resumo por fornecedor ----
             const entries = Object.entries(supplierTotals); // [ [nome, {paid, nf}], ... ]
