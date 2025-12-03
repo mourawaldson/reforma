@@ -1,0 +1,54 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: reforma_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: controle_reforma
+      MYSQL_USER: reforma
+      MYSQL_PASSWORD: reforma
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Pasta de scripts de inicialização (schema, etc.)
+      - ./sql:/docker-entrypoint-initdb.d:ro
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: reforma_api
+    depends_on:
+      - db
+    ports:
+      - "8000:80"
+    volumes:
+      - ./api:/var/www/html
+
+  backoffice:
+    build:
+      context: ./backoffice
+      dockerfile: Dockerfile
+    container_name: reforma_backoffice
+    depends_on:
+      - api
+    ports:
+      - "8001:80"
+    volumes:
+      - ./backoffice:/var/www/html
+
+  dashboards:
+    build:
+      context: ./dashboards
+      dockerfile: Dockerfile
+    container_name: reforma_dashboards
+    depends_on:
+      - api
+    ports:
+      - "8002:80"
+    volumes:
+      - ./dashboards:/var/www/html
+
+volumes:
+  db_data:
