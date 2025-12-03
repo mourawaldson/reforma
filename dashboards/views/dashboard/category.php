@@ -13,20 +13,35 @@
     </div>
 </form>
 
+<?php
+    $totalPaid = $data['summary']['total_paid'] ?? 0;
+    $totalNf   = $data['summary']['total_nf'] ?? 0;
+    // Diferença entre NF e pago (NF - Pago)
+    $diffNfPaid = $totalNf - $totalPaid;
+?>
+
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
-                <h6>Total Pago</h6>
-                <h3>R$ <?php echo number_format($data['summary']['total_paid'], 2, ',', '.'); ?></h3>
+                <h6>Total NF</h6>
+                <h3>R$ <?php echo number_format($totalNf, 2, ',', '.'); ?></h3>
             </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
-                <h6>Total NF</h6>
-                <h3>R$ <?php echo number_format($data['summary']['total_nf'], 2, ',', '.'); ?></h3>
+                <h6>Total Pago</h6>
+                <h3>R$ <?php echo number_format($totalPaid, 2, ',', '.'); ?></h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>Diferença (NF - Pago)</h6>
+                <h3>R$ <?php echo number_format($diffNfPaid, 2, ',', '.'); ?></h3>
             </div>
         </div>
     </div>
