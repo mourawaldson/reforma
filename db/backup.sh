@@ -6,7 +6,7 @@ CONTAINER_NAME="reforma_db"
 DB_NAME="controle_reforma"
 DB_USER="root"
 DB_PASS="root"
-BACKUP_DIR="./sql/backups"
+BACKUP_DIR="./db/backups"
 
 # Garante que a pasta existe
 mkdir -p "$BACKUP_DIR"

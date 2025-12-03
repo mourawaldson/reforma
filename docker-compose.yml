@@ -56,8 +56,8 @@ services:
       - db
     environment:
       PMA_HOST: db
-      PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_USER: reforma
+      PMA_PASSWORD: reforma
       UPLOAD_LIMIT: 512M
     ports:
       - "8080:80"
