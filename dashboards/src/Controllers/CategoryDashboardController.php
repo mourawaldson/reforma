@@ -19,11 +19,7 @@ class CategoryDashboardController
 
     public function index()
     {
-        // Filtros opcionais da URL (se quiser reaproveitar)
         $query = [];
-        if (!empty($_GET['year'])) {
-            $query['year'] = (int)$_GET['year'];
-        }
         if (!empty($_GET['supplier_id'])) {
             $query['supplier_id'] = (int)$_GET['supplier_id'];
         }
@@ -33,7 +29,7 @@ class CategoryDashboardController
 
         try {
             $options = [];
-            if (!empty($query)) {
+            if ($query) {
                 $options['query'] = $query;
             }
 
@@ -41,14 +37,14 @@ class CategoryDashboardController
             $body     = $response->getBody()->getContents();
             $apiData  = json_decode($body, true);
 
-            $data = [
-                'years' => $apiData['years'] ?? [],
-            ];
+            $data = $apiData;
         } catch (\Throwable $e) {
-            // Em caso de erro na API, evita quebrar a página
             $data = [
-                'years' => [],
-                'error' => $e->getMessage(),
+                'year'    => date('Y'),
+                'summary' => ['total_paid' => 0, 'total_nf' => 0],
+                'data'    => [],
+                'pending' => ['count' => 0, 'total_paid' => 0, 'total_nf' => 0, 'diff_nf_paid' => 0],
+                'error'   => $e->getMessage(),
             ];
         }
 

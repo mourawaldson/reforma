@@ -12,23 +12,9 @@
     <a href="/expenses/create" class="btn btn-primary">+ Nova despesa</a>
 </div>
 
-<form class="row g-2 mb-3" id="filter-form">
-    <div class="col-auto">
-        <label for="filter-year" class="col-form-label">Ano:</label>
-    </div>
-    <div class="col-auto">
-        <input type="number" class="form-control" id="filter-year" name="year" value="<?php echo date('Y'); ?>">
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
-    </div>
-</form>
-
 <div id="expenses-table-wrapper">
     <div class="text-muted">Carregando...</div>
 </div>
-
-<div id="supplier-summary-wrapper" class="mt-4"></div>
 
 <script>
 $(function() {
@@ -62,129 +48,186 @@ $(function() {
     });
 
     function loadExpenses() {
-        const year = $('#filter-year').val();
-
-        $.getJSON(API_BASE + '/expenses', { year }, function(data) {
+        $.getJSON(API_BASE + '/expenses', function(data) {
             if (!Array.isArray(data) || data.length === 0) {
                 $('#expenses-table-wrapper').html('<div class="alert alert-info">Nenhuma despesa encontrada.</div>');
-                $('#supplier-summary-wrapper').html('');
                 return;
             }
 
-            // Totais gerais
-            let totalPaid = 0;
-            let totalNf = 0;
-
-            // Totais por fornecedor
-            const supplierTotals = {}; // { nomeFornecedor: { paid: x, nf: y } }
-
-            let html = '<div class="table-responsive"><table id="expenses-table" class="table table-sm table-striped align-middle"><thead><tr>';
-            html += '<th>Data</th><th>Categoria</th><th>Fornecedor</th><th>Descrição</th><th class="text-end">NF</th><th class="text-end">Pago</th><th>Tags</th><th></th>';
-            html += '</tr></thead><tbody>';
+            // Agrupa por ano-calendário
+            const yearsMap = {}; // { 2024: { pending: [], confirmed: [] }, ... }
 
             data.forEach(function(e) {
-                const nfVal   = e.amount_nf !== null ? Number(e.amount_nf) : 0;
-                const paidVal = e.amount_paid !== null ? Number(e.amount_paid) : 0;
-
-                totalNf   += nfVal;
-                totalPaid += paidVal;
-
-                const supplierName = e.supplier_name || '(Sem fornecedor)';
-                if (!supplierTotals[supplierName]) {
-                    supplierTotals[supplierName] = { paid: 0, nf: 0 };
+                let year = e.calendar_year;
+                if (!year && e.date) {
+                    year = e.date.substring(0, 4);
                 }
-                supplierTotals[supplierName].paid += paidVal;
-                supplierTotals[supplierName].nf   += nfVal;
+                if (!year) {
+                    year = 'Sem ano';
+                }
 
-                const tags = (e.tags || []).map(t => '<span class="badge bg-secondary me-1">'+t.name+'</span>').join('');
+                if (!yearsMap[year]) {
+                    yearsMap[year] = {
+                        pending: [],
+                        confirmed: []
+                    };
+                }
 
-                const description = e.description || '';
-                const descriptionTitle = description.replace(/"/g, '&quot;');
+                const isConfirmed = (e.is_confirmed === 1 || e.is_confirmed === '1' || e.is_confirmed === true);
 
-                html += '<tr>';
-                html += '<td>'+formatDateBR(e.date)+'</td>';
-                html += '<td>'+(e.category_name || '')+'</td>';
-                html += '<td>'+(e.supplier_name || '')+'</td>';
-                // descrição truncada por CSS, texto completo no title
-                html += '<td class="descricao-coluna" title="'+descriptionTitle+'">'+description+'</td>';
-                html += '<td class="text-end">'+(e.amount_nf !== null ? formatCurrencyBRFromNumber(e.amount_nf) : '')+'</td>';
-                html += '<td class="text-end">'+formatCurrencyBRFromNumber(e.amount_paid)+'</td>';
-                html += '<td>'+tags+'</td>';
-                html += '<td><a href="/expenses/'+e.id+'/edit" class="btn btn-sm btn-outline-secondary">Editar</a></td>';
-                html += '</tr>';
+                if (isConfirmed) {
+                    yearsMap[year].confirmed.push(e);
+                } else {
+                    yearsMap[year].pending.push(e);
+                }
             });
 
-            // Rodapé com total geral
-            html += '</tbody><tfoot>';
-            html += '<tr>';
-            html += '<th colspan="4" class="text-end">Total</th>';
-            html += '<th class="text-end">'+formatCurrencyBRFromNumber(totalNf)+'</th>';
-            html += '<th class="text-end">'+formatCurrencyBRFromNumber(totalPaid)+'</th>';
-            html += '<th colspan="2"></th>';
-            html += '</tr>';
-            html += '</tfoot></table></div>';
+            const yearKeys = Object.keys(yearsMap).sort();
 
-            // Se já existe uma DataTable anterior, destrói antes de recriar
-            if ($.fn.DataTable.isDataTable('#expenses-table')) {
-                $('#expenses-table').DataTable().destroy();
+            if (yearKeys.length === 0) {
+                $('#expenses-table-wrapper').html('<div class="alert alert-info">Nenhuma despesa encontrada.</div>');
+                return;
             }
+
+            let html = '';
+
+            yearKeys.forEach(function(year) {
+                const yearData  = yearsMap[year];
+                const pending   = yearData.pending;
+                const confirmed = yearData.confirmed;
+
+                html += '<div class="mb-4">';
+                html += '<h2 class="h5 mb-3">Ano ' + year + '</h2>';
+
+                // Pendentes deste ano
+                if (pending.length > 0) {
+                    html += '<div class="card border-warning mb-3">';
+                    html += '<div class="card-header bg-warning-subtle"><strong>Pendentes de confirmação</strong></div>';
+                    html += '<div class="card-body p-0">';
+                    html += '<div class="table-responsive mb-0">';
+                    html += '<table class="table table-sm table-striped align-middle mb-0">';
+                    html += '<thead><tr>';
+                    html += '<th>Data</th><th>Categoria</th><th>Fornecedor</th><th>Descrição</th><th class="text-end">NF</th><th class="text-end">Pago</th><th class="text-center">Ações</th>';
+                    html += '</tr></thead><tbody>';
+
+                    pending.forEach(function(e) {
+                        const description = e.description || '';
+                        const descriptionTitle = description.replace(/"/g, '&quot;');
+
+                        html += '<tr>';
+                        html += '<td>' + formatDateBR(e.date) + '</td>';
+                        html += '<td>' + (e.category_name || '') + '</td>';
+                        html += '<td>' + (e.supplier_name || '') + '</td>';
+                        html += '<td class="descricao-coluna" title="' + descriptionTitle + '">' + description + '</td>';
+                        html += '<td class="text-end">' + (e.amount_nf !== null ? formatCurrencyBRFromNumber(e.amount_nf) : '') + '</td>';
+                        html += '<td class="text-end">' + formatCurrencyBRFromNumber(e.amount_paid) + '</td>';
+                        html += '<td class="text-center">';
+                        html += '<button type="button" class="btn btn-sm btn-outline-success btn-confirm-expense" data-id="' + e.id + '">Confirmar</button>';
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table></div></div></div>';
+                }
+
+                // Confirmadas deste ano
+                if (confirmed.length > 0) {
+                    let totalPaid = 0;
+                    let totalNf   = 0;
+
+                    const tableId = 'expenses-table-' + year;
+
+                    html += '<div class="card">';
+                    html += '<div class="card-body">';
+                    html += '<h3 class="h6 mb-3">Despesas confirmadas</h3>';
+                    html += '<div class="table-responsive">';
+                    html += '<table id="' + tableId + '" class="table table-sm table-striped align-middle">';
+                    html += '<thead><tr>';
+                    html += '<th>Data</th><th>Categoria</th><th>Fornecedor</th><th>Descrição</th><th class="text-end">NF</th><th class="text-end">Pago</th><th>Tags</th><th></th>';
+                    html += '</tr></thead><tbody>';
+
+                    confirmed.forEach(function(e) {
+                        const nfVal   = e.amount_nf !== null ? Number(e.amount_nf) : 0;
+                        const paidVal = e.amount_paid !== null ? Number(e.amount_paid) : 0;
+
+                        totalNf   += nfVal;
+                        totalPaid += paidVal;
+
+                        const tags = (e.tags || []).map(function(t) {
+                            return '<span class="badge bg-secondary me-1">' + t.name + '</span>';
+                        }).join('');
+
+                        const description = e.description || '';
+                        const descriptionTitle = description.replace(/"/g, '&quot;');
+
+                        html += '<tr>';
+                        html += '<td>' + formatDateBR(e.date) + '</td>';
+                        html += '<td>' + (e.category_name || '') + '</td>';
+                        html += '<td>' + (e.supplier_name || '') + '</td>';
+                        html += '<td class="descricao-coluna" title="' + descriptionTitle + '">' + description + '</td>';
+                        html += '<td class="text-end">' + (e.amount_nf !== null ? formatCurrencyBRFromNumber(e.amount_nf) : '') + '</td>';
+                        html += '<td class="text-end">' + formatCurrencyBRFromNumber(e.amount_paid) + '</td>';
+                        html += '<td>' + tags + '</td>';
+                        html += '<td><a href="/expenses/' + e.id + '/edit" class="btn btn-sm btn-outline-secondary">Editar</a></td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody><tfoot>';
+                    html += '<tr>';
+                    html += '<th colspan="4" class="text-end">Total ano ' + year + '</th>';
+                    html += '<th class="text-end">' + formatCurrencyBRFromNumber(totalNf) + '</th>';
+                    html += '<th class="text-end">' + formatCurrencyBRFromNumber(totalPaid) + '</th>';
+                    html += '<th colspan="2"></th>';
+                    html += '</tr>';
+                    html += '</tfoot></table></div></div></div>';
+                } else {
+                    html += '<div class="alert alert-info">Nenhuma despesa confirmada para este ano.</div>';
+                }
+
+                html += '</div>'; // fim bloco ano
+            });
 
             $('#expenses-table-wrapper').html(html);
 
-            // Inicializa DataTables com paginação, ordenação e pt-BR
-            $('#expenses-table').DataTable({
-                order: [],
-                pageLength: 50,
-                language: {
-                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
-                },
-                columnDefs: [
-                    { targets: 0, type: 'date-eu' },   // coluna Data
-                    { targets: [4, 5], className: 'text-end' } // garante alinhamento de NF / Pago
-                ]
+            // Inicializa DataTables em cada tabela de ano
+            yearKeys.forEach(function(year) {
+                const tableSelector = '#expenses-table-' + year;
+                if ($(tableSelector).length) {
+                    $(tableSelector).DataTable({
+                        order: [],
+                        pageLength: 50,
+                        language: {
+                            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+                        },
+                        columnDefs: [
+                            { targets: 0, type: 'date-eu' },   // Data
+                            { targets: [4, 5], className: 'text-end' } // NF / Pago alinhados
+                        ]
+                    });
+                }
             });
-
-            // ---- Resumo por fornecedor ----
-            const entries = Object.entries(supplierTotals); // [ [nome, {paid, nf}], ... ]
-
-            if (entries.length === 0) {
-                $('#supplier-summary-wrapper').html('');
-                return;
-            }
-
-            // Ordena por total pago desc
-            entries.sort(function(a, b) {
-                return b[1].paid - a[1].paid;
-            });
-
-            let sHtml = '<div class="card">';
-            sHtml += '<div class="card-body">';
-            sHtml += '<h2 class="h5 mb-3">Resumo por fornecedor</h2>';
-            sHtml += '<div class="table-responsive"><table class="table table-sm table-striped align-middle mb-0">';
-            sHtml += '<thead><tr><th>Fornecedor</th><th class="text-end">Total NF</th><th class="text-end">Total Pago</th></tr></thead><tbody>';
-
-            entries.forEach(function([name, totals]) {
-                sHtml += '<tr>';
-                sHtml += '<td>'+name+'</td>';
-                sHtml += '<td class="text-end">'+formatCurrencyBRFromNumber(totals.nf)+'</td>';
-                sHtml += '<td class="text-end">'+formatCurrencyBRFromNumber(totals.paid)+'</td>';
-                sHtml += '</tr>';
-            });
-
-            sHtml += '</tbody></table></div>';
-            sHtml += '</div></div>';
-
-            $('#supplier-summary-wrapper').html(sHtml);
 
         }).fail(function() {
             $('#expenses-table-wrapper').html('<div class="alert alert-danger">Erro ao carregar despesas.</div>');
-            $('#supplier-summary-wrapper').html('');
         });
     }
 
-    $('#filter-form').on('submit', function(e) {
-        e.preventDefault();
-        loadExpenses();
+    // Confirmação de despesa (pendentes)
+    $(document).on('click', '.btn-confirm-expense', function() {
+        const id = $(this).data('id');
+        if (!id) return;
+
+        if (!confirm('Confirmar lançamento desta despesa?')) {
+            return;
+        }
+
+        $.post(API_BASE + '/expenses/' + id + '/confirm')
+            .done(function() {
+                loadExpenses();
+            })
+            .fail(function() {
+                alert('Erro ao confirmar despesa.');
+            });
     });
 
     loadExpenses();
