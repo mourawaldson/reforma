@@ -57,7 +57,7 @@ class Expense
             $tagStmt->execute($ids);
             while ($t = $tagStmt->fetch()) {
                 $tagsByExpense[$t['expense_id']][] = [
-                    'id' => (int)$t['id'],
+                    'id'   => (int)$t['id'],
                     'name' => $t['name'],
                 ];
             }
@@ -91,7 +91,7 @@ class Expense
         $tagStmt->execute(['id' => $id]);
         $tags = $tagStmt->fetchAll();
         $row['tags'] = array_map(fn($t) => [
-            'id' => (int)$t['id'],
+            'id'   => (int)$t['id'],
             'name' => $t['name']
         ], $tags);
 
@@ -102,8 +102,8 @@ class Expense
     {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("INSERT INTO expenses
-            (category_id, supplier_id, date, description, amount_nf, amount_paid, calendar_year)
-            VALUES (:category_id, :supplier_id, :date, :description, :amount_nf, :amount_paid, :calendar_year)");
+            (category_id, supplier_id, date, description, amount_nf, amount_paid, calendar_year, is_confirmed)
+            VALUES (:category_id, :supplier_id, :date, :description, :amount_nf, :amount_paid, :calendar_year, :is_confirmed)");
         $stmt->execute([
             'category_id'   => (int)$data['category_id'],
             'supplier_id'   => $data['supplier_id'] !== null ? (int)$data['supplier_id'] : null,
@@ -112,6 +112,7 @@ class Expense
             'amount_nf'     => $data['amount_nf'] !== null ? $data['amount_nf'] : null,
             'amount_paid'   => $data['amount_paid'],
             'calendar_year' => (int)$data['calendar_year'],
+            'is_confirmed'  => isset($data['is_confirmed']) ? (int)$data['is_confirmed'] : 1,
         ]);
         $id = (int)$pdo->lastInsertId();
         self::setTags($id, $tags);
