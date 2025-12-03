@@ -1,7 +1,12 @@
 FROM php:8.3-apache
 
-# Extensões do PHP
-RUN docker-php-ext-install pdo pdo_mysql
+# Extensões do PHP + dependências para Composer
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+ && docker-php-ext-install pdo pdo_mysql zip \
+ && rm -rf /var/lib/apt/lists/*
 
 # Habilita mod_rewrite e aponta DocumentRoot para /public
 RUN a2enmod rewrite && \
@@ -10,4 +15,15 @@ RUN a2enmod rewrite && \
 
 WORKDIR /var/www/html
 
+# Copia Composer da imagem oficial
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copia o código da API para a imagem (vai ser sobrescrito pelo volume em dev,
+# mas serve pra cenários sem volume)
 COPY . /var/www/html
+
+# Script de entrada que garante composer install se precisar
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
