@@ -18,10 +18,9 @@ $(function() {
                 return;
             }
             let html = '<div class="table-responsive"><table class="table table-sm table-striped align-middle">';
-            html += '<thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>CPF/CNPJ</th><th></th></tr></thead><tbody>';
+            html += '<thead><tr><th>Nome</th><th>Tipo</th><th>CPF/CNPJ</th><th></th></tr></thead><tbody>';
             data.forEach(function(s) {
                 html += '<tr>';
-                html += '<td>'+s.id+'</td>';
                 html += '<td>'+s.name+'</td>';
                 html += '<td>'+(s.type || '')+'</td>';
                 html += '<td>'+(s.cpf_cnpj || '')+'</td>';

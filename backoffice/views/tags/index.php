@@ -18,10 +18,9 @@ $(function() {
                 return;
             }
             let html = '<div class="table-responsive"><table class="table table-sm table-striped align-middle">';
-            html += '<thead><tr><th>ID</th><th>Nome</th><th></th></tr></thead><tbody>';
+            html += '<thead><tr><th>Nome</th><th>Ações</th></tr></thead><tbody>';
             data.forEach(function(t) {
                 html += '<tr>';
-                html += '<td>'+t.id+'</td>';
                 html += '<td>'+t.name+'</td>';
                 html += '<td><a href="/tags/'+t.id+'/edit" class="btn btn-sm btn-outline-secondary">Editar</a></td>';
                 html += '</tr>';
