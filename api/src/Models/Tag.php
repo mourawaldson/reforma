@@ -6,7 +6,7 @@ class Tag
     public static function all(): array
     {
         $pdo = Database::getConnection();
-        $stmt = $pdo->query("SELECT * FROM tags ORDER BY id");
+        $stmt = $pdo->query("SELECT * FROM tags ORDER BY name");
         return $stmt->fetchAll();
     }
 

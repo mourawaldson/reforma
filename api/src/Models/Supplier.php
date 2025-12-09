@@ -6,7 +6,7 @@ class Supplier
     public static function all(): array
     {
         $pdo = Database::getConnection();
-        $stmt = $pdo->query("SELECT * FROM suppliers ORDER BY id");
+        $stmt = $pdo->query("SELECT * FROM suppliers ORDER BY name ASC");
         return $stmt->fetchAll();
     }
 
