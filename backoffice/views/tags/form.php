@@ -6,7 +6,7 @@
 
     <div class="mb-3">
         <label for="name" class="form-label">Nome</label>
-        <input type="text" class="form-control" id="name" required maxlength="100">
+        <input type="text" class="form-control" id="name" required maxlength="100" autofocus>
         <div class="form-text">Máximo de 100 caracteres.</div>
         <div class="invalid-feedback">O nome é obrigatório e deve ter no máximo 100 caracteres.</div>
     </div>
