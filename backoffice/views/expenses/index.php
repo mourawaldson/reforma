@@ -160,7 +160,7 @@ $(function() {
                         const description = e.description || '';
                         const descriptionTitle = description.replace(/"/g, '&quot;');
 
-                        html += '<tr'+((nfVal !== paidVal) ? ' class="table-warning"': '') +'>';
+                        html += '<tr'+((nfVal > paidVal) ? ' class="table-warning"': (nfVal < paidVal) ? ' class="table-danger"' : '') +'>';
                         html += '<td>' + formatDateBR(e.date) + '</td>';
                         html += '<td>' + (e.category_name || '') + '</td>';
                         html += '<td>' + (e.supplier_name || '') + '</td>';
