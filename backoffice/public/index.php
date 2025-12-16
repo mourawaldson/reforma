@@ -1,14 +1,12 @@
 <?php
 require_once __DIR__ . '/../src/Router.php';
 require_once __DIR__ . '/../src/Controllers/ExpensesController.php';
-require_once __DIR__ . '/../src/Controllers/CategoriesController.php';
 require_once __DIR__ . '/../src/Controllers/SuppliersController.php';
 require_once __DIR__ . '/../src/Controllers/TagsController.php';
 
 $router = new Router();
 
 $expCtrl  = new ExpensesController();
-$catCtrl  = new CategoriesController();
 $supCtrl  = new SuppliersController();
 $tagCtrl  = new TagsController();
 
@@ -17,11 +15,6 @@ $router->add('GET', '/',                [$expCtrl, 'index']);
 $router->add('GET', '/expenses',        [$expCtrl, 'index']);
 $router->add('GET', '/expenses/create', [$expCtrl, 'create']);
 $router->add('GET', '/expenses/([0-9]+)/edit', [$expCtrl, 'edit']);
-
-// Categorias
-$router->add('GET', '/categories',             [$catCtrl, 'index']);
-$router->add('GET', '/categories/create',      [$catCtrl, 'create']);
-$router->add('GET', '/categories/([0-9]+)/edit', [$catCtrl, 'edit']);
 
 // Fornecedores
 $router->add('GET', '/suppliers',              [$supCtrl, 'index']);
