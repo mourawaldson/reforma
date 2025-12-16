@@ -66,25 +66,55 @@ $(function() {
     FH.attachCurrencyMask('.currency');
     FH.clearInvalidOnChange('#expense-form');
 
+    function formatCpfCnpj(value) {
+        if (!value) return '';
+
+        const digits = value.replace(/\D/g, '');
+
+        if (digits.length === 11) {
+            // CPF
+            return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+
+        if (digits.length === 14) {
+            // CNPJ
+            return digits.replace(
+                /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+                '$1.$2.$3/$4-$5'
+            );
+        }
+
+        return value;
+    }
+
     function loadOptions() {
         $.getJSON(API_BASE + '/categories', function(data) {
             const $sel = $('#category_id');
             data.forEach(function(c) {
-                $sel.append('<option value="'+c.id+'">'+c.name+'</option>');
+                $sel.append('<option value="' + c.id + '">' + c.name + '</option>');
             });
         });
 
         $.getJSON(API_BASE + '/suppliers', function(data) {
             const $sel = $('#supplier_id');
+
             data.forEach(function(s) {
-                $sel.append('<option value="'+s.id+'">'+s.name+'</option>');
+                let label = s.display_name || '';
+
+                if (s.cpf_cnpj) {
+                    label += ' — ' + formatCpfCnpj(s.cpf_cnpj);
+                }
+
+                $sel.append(
+                    '<option value="' + s.id + '">' + label + '</option>'
+                );
             });
         });
 
         $.getJSON(API_BASE + '/tags', function(data) {
             const $sel = $('#tags_select');
             data.forEach(function(t) {
-                $sel.append('<option value="'+t.id+'">'+t.name+'</option>');
+                $sel.append('<option value="' + t.id + '">' + t.name + '</option>');
             });
         });
     }

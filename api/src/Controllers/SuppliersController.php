@@ -10,78 +10,131 @@ class SuppliersController
         return is_array($data) ? $data : [];
     }
 
+    private function normalizeCpfCnpj(?string $value): ?string
+    {
+        if (!$value) return null;
+        return preg_replace('/\D/', '', $value);
+    }
+
     public function index()
     {
-        $data = Supplier::all();
         header('Content-Type: application/json');
-        echo json_encode($data);
+        echo json_encode(Supplier::all());
     }
 
     public function show($id)
     {
         $row = Supplier::find((int)$id);
         header('Content-Type: application/json');
+
         if (!$row) {
             http_response_code(404);
-            echo json_encode(['error' => 'Supplier not found']);
+            echo json_encode(['error' => 'Fornecedor não encontrado']);
             return;
         }
+
         echo json_encode($row);
     }
 
     public function store()
     {
         $data = $this->getJsonInput();
+
         if (empty($data['name'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Field name is required']);
+            echo json_encode(['error' => 'Nome é obrigatório']);
             return;
         }
-        $payload = [
-            'name'     => $data['name'],
-            'type'     => $data['type'] ?? null,
-            'cpf_cnpj' => $data['cpf_cnpj'] ?? null,
-        ];
-        $id = Supplier::create($payload);
+
+        $cpfCnpj = $this->normalizeCpfCnpj($data['cpf_cnpj'] ?? null);
+
+        if ($cpfCnpj) {
+            $existing = Supplier::findByCpfCnpj($cpfCnpj);
+
+            if ($existing) {
+                $isCnpj = strlen($cpfCnpj) === 14;
+
+                http_response_code(400);
+                echo json_encode([
+                    'error' => $isCnpj
+                        ? 'Já existe um fornecedor pessoa jurídica cadastrado com este CNPJ'
+                        : 'Já existe um fornecedor pessoa física cadastrado com este CPF'
+                ]);
+                return;
+            }
+        }
+
+        $id = Supplier::create([
+            'name'         => $data['name'],
+            'company_name' => $data['company_name'] ?? null,
+            'cpf_cnpj'     => $cpfCnpj,
+        ]);
+
         header('Content-Type: application/json');
         http_response_code(201);
-        echo json_encode(['id' => $id, 'message' => 'Supplier created']);
+        echo json_encode(['id' => $id]);
     }
 
     public function update($id)
     {
         $id = (int)$id;
+
         if (!Supplier::find($id)) {
             http_response_code(404);
-            echo json_encode(['error' => 'Supplier not found']);
+            echo json_encode(['error' => 'Fornecedor não encontrado']);
             return;
         }
+
         $data = $this->getJsonInput();
+
         if (empty($data['name'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Field name is required']);
+            echo json_encode(['error' => 'Nome é obrigatório']);
             return;
         }
-        $payload = [
-            'name'     => $data['name'],
-            'type'     => $data['type'] ?? null,
-            'cpf_cnpj' => $data['cpf_cnpj'] ?? null,
-        ];
-        Supplier::update($id, $payload);
+
+        $cpfCnpj = $this->normalizeCpfCnpj($data['cpf_cnpj'] ?? null);
+
+        if ($cpfCnpj) {
+            $existing = Supplier::findByCpfCnpj($cpfCnpj);
+
+            // se existir e NÃO for o próprio registro
+            if ($existing && (int)$existing['id'] !== $id) {
+                $isCnpj = strlen($cpfCnpj) === 14;
+
+                http_response_code(400);
+                echo json_encode([
+                    'error' => $isCnpj
+                        ? 'Já existe um fornecedor pessoa jurídica cadastrado com este CNPJ'
+                        : 'Já existe um fornecedor pessoa física cadastrado com este CPF'
+                ]);
+                return;
+            }
+        }
+
+        Supplier::update($id, [
+            'name'         => $data['name'],
+            'company_name' => $data['company_name'] ?? null,
+            'cpf_cnpj'     => $cpfCnpj,
+        ]);
+
         header('Content-Type: application/json');
-        echo json_encode(['message' => 'Supplier updated']);
+        echo json_encode(['message' => 'Fornecedor atualizado']);
     }
 
     public function destroy($id)
     {
         $id = (int)$id;
+
         if (!Supplier::find($id)) {
             http_response_code(404);
-            echo json_encode(['error' => 'Supplier not found']);
+            echo json_encode(['error' => 'Fornecedor não encontrado']);
             return;
         }
+
         Supplier::delete($id);
+
         header('Content-Type: application/json');
-        echo json_encode(['message' => 'Supplier deleted']);
+        echo json_encode(['message' => 'Fornecedor removido']);
     }
 }
