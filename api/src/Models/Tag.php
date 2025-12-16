@@ -19,6 +19,15 @@ class Tag
         return $row ?: null;
     }
 
+    public static function findByName(string $name): ?array
+    {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM tags WHERE name = :name");
+        $stmt->execute(['name' => $name]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function create(array $data): int
     {
         $pdo = Database::getConnection();
@@ -35,6 +44,13 @@ class Tag
             'name' => $data['name'],
             'id'   => $id,
         ]);
+    }
+
+    public static function deleteExpenseRelations(int $tagId): bool
+    {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("DELETE FROM expense_tags WHERE tag_id = :tag_id");
+        return $stmt->execute(['tag_id' => $tagId]);
     }
 
     public static function delete(int $id): bool
