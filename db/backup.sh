@@ -12,7 +12,7 @@ DB_PASS="root"
 BACKUP_DIR="./db/backups"
 
 # Ordem correta das tabelas (pais → filhos)
-TABLES_ORDER=("categories" "suppliers" "tags" "expenses" "expense_tags")
+TABLES_ORDER=("suppliers" "tags" "expenses" "expense_tags")
 
 ########################################
 # Preparação
