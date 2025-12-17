@@ -54,9 +54,8 @@ class DashboardPageController
 
     public function tags()
     {
-        $this->render('tags', [
-            'info' => 'Dashboard de tags ainda não disponível.'
-        ]);
+        $data = $this->fetchApi('dashboard/tags');
+        $this->render('tags', $data);
     }
 
     public function suppliers()

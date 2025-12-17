@@ -33,7 +33,7 @@ class DashboardController
         }
 
         // =========================
-        // PENDENTES (já existente)
+        // PENDENTES
         // =========================
         $stmt = $pdo->query("
             SELECT
@@ -132,6 +132,67 @@ class DashboardController
                 'additional_discount' => $totalDiscount,
                 'vet'                 => $totalVet,
             ]
+        ]);
+    }
+
+    public function tags()
+    {
+        $pdo = Database::getConnection();
+
+        // =========================
+        // TOTAL PAGO GLOBAL (confirmadas)
+        // =========================
+        $totalPaid = (float)$pdo
+            ->query("SELECT SUM(amount_paid) FROM expenses WHERE is_confirmed = 1")
+            ->fetchColumn();
+
+        // =========================
+        // TOTAL PAGO POR ANO → TAG
+        // =========================
+        $sql = "
+            SELECT
+                e.calendar_year,
+                t.name AS tag_name,
+                COUNT(*) AS count,
+                SUM(e.amount_paid) AS total_paid
+            FROM expenses e
+            JOIN expense_tags et ON et.expense_id = e.id
+            JOIN tags t ON t.id = et.tag_id
+            WHERE e.is_confirmed = 1
+            GROUP BY e.calendar_year, t.id
+            ORDER BY e.calendar_year ASC, total_paid DESC
+        ";
+
+        $stmt = $pdo->query($sql);
+        $rows = $stmt->fetchAll();
+
+        $years = [];
+        $table = [];
+
+        foreach ($rows as $r) {
+            $year = (int)$r['calendar_year'];
+
+            $years[$year]['tags'][] = [
+                'tag'        => $r['tag_name'],
+                'count'      => (int)$r['count'],
+                'total_paid' => (float)$r['total_paid'],
+            ];
+
+            $table[] = [
+                'year'       => $year,
+                'tag'        => $r['tag_name'],
+                'count'      => (int)$r['count'],
+                'total_paid' => (float)$r['total_paid'],
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'summary' => [
+                'total_paid' => $totalPaid
+            ],
+            'years' => $years,
+            'table' => $table
         ]);
     }
 }

@@ -63,5 +63,6 @@ $router->add('DELETE', '/tags/([0-9]+)',        [$tags, 'destroy']);
 // =====================
 $router->add('GET', '/dashboard/expenses', [$dashboard, 'expenses']);
 $router->add('GET', '/dashboard/discounts', [$dashboard, 'discounts']);
+$router->add('GET', '/dashboard/tags', [$dashboard, 'tags']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $uriPath);
