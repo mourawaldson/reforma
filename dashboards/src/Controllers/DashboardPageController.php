@@ -38,7 +38,8 @@ class DashboardPageController
 
     public function index()
     {
-        $this->render('index');
+        $data = $this->fetchApi('dashboard/overview');
+        $this->render('index', $data);
     }
 
     public function expenses()

@@ -3,6 +3,40 @@ require_once __DIR__ . '/../Database.php';
 
 class DashboardController
 {
+    public function overview()
+    {
+        $pdo = Database::getConnection();
+
+        // Total acumulado (confirmadas)
+        $total = (float)$pdo->query("
+            SELECT SUM(amount_paid)
+            FROM expenses
+            WHERE is_confirmed = 1
+        ")->fetchColumn();
+
+        // Total por ano
+        $stmt = $pdo->query("
+            SELECT
+                calendar_year,
+                SUM(amount_paid) AS total_paid
+            FROM expenses
+            WHERE is_confirmed = 1
+            GROUP BY calendar_year
+            ORDER BY calendar_year
+        ");
+
+        $years = [];
+        foreach ($stmt->fetchAll() as $r) {
+            $years[$r['calendar_year']] = (float)$r['total_paid'];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'total' => $total,
+            'years' => $years
+        ]);
+    }
+
     public function expenses()
     {
         $pdo = Database::getConnection();

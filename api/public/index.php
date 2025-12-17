@@ -61,6 +61,7 @@ $router->add('DELETE', '/tags/([0-9]+)',        [$tags, 'destroy']);
 // =====================
 // Dashboard
 // =====================
+$router->add('GET', '/dashboard/overview', [$dashboard, 'overview']);
 $router->add('GET', '/dashboard/expenses', [$dashboard, 'expenses']);
 $router->add('GET', '/dashboard/discounts', [$dashboard, 'discounts']);
 $router->add('GET', '/dashboard/tags', [$dashboard, 'tags']);
