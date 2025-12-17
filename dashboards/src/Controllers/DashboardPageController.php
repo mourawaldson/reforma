@@ -60,8 +60,7 @@ class DashboardPageController
 
     public function suppliers()
     {
-        $this->render('suppliers', [
-            'info' => 'Dashboard de fornecedores ainda não disponível.'
-        ]);
+        $data = $this->fetchApi('dashboard/suppliers');
+        $this->render('suppliers', $data);
     }
 }

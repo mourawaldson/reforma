@@ -195,4 +195,64 @@ class DashboardController
             'table' => $table
         ]);
     }
+
+    public function suppliers()
+    {
+        $pdo = Database::getConnection();
+
+        // =========================
+        // TOTAL PAGO GLOBAL (confirmadas)
+        // =========================
+        $totalPaid = (float)$pdo
+            ->query("SELECT SUM(amount_paid) FROM expenses WHERE is_confirmed = 1")
+            ->fetchColumn();
+
+        // =========================
+        // TOTAL PAGO POR ANO → SUPPLIER
+        // =========================
+        $sql = "
+            SELECT
+                e.calendar_year,
+                s.name AS supplier_name,
+                COUNT(*) AS count,
+                SUM(e.amount_paid) AS total_paid
+            FROM expenses e
+            JOIN suppliers s ON s.id = e.supplier_id
+            WHERE e.is_confirmed = 1
+            GROUP BY e.calendar_year, s.id
+            ORDER BY e.calendar_year ASC, total_paid DESC
+        ";
+
+        $stmt = $pdo->query($sql);
+        $rows = $stmt->fetchAll();
+
+        $years = [];
+        $table = [];
+
+        foreach ($rows as $r) {
+            $year = (int)$r['calendar_year'];
+
+            $years[$year]['suppliers'][] = [
+                'supplier'   => $r['supplier_name'],
+                'count'      => (int)$r['count'],
+                'total_paid' => (float)$r['total_paid'],
+            ];
+
+            $table[] = [
+                'year'       => $year,
+                'supplier'   => $r['supplier_name'],
+                'count'      => (int)$r['count'],
+                'total_paid' => (float)$r['total_paid'],
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'summary' => [
+                'total_paid' => $totalPaid
+            ],
+            'years' => $years,
+            'table' => $table
+        ]);
+    }
 }
