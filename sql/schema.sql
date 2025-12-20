@@ -1,45 +1,44 @@
-CREATE TABLE IF NOT EXISTS categories (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS suppliers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  type VARCHAR(100) NULL,
-  cpf_cnpj VARCHAR(20) NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS `suppliers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `cpf_cnpj` varchar(20) DEFAULT NULL,
+  `pf_pj` enum('PF','PJ') NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `company_name` varchar(255) DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_suppliers_cpf_cnpj` (`cpf_cnpj`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `tags` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `expenses` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `supplier_id` int DEFAULT NULL,
+  `date` date NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `amount_nf` decimal(10,2) DEFAULT NULL,
+  `amount_paid` decimal(10,2) NOT NULL,
+  `additional_discount` decimal(10,2) DEFAULT NULL,
+  `calendar_year` int NOT NULL,
+  `is_confirmed` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_exp_supplier` (`supplier_id`),
+  KEY `idx_expenses_is_confirmed` (`is_confirmed`),
+  CONSTRAINT `fk_exp_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `expense_tags` (
+  `expense_id` int NOT NULL,
+  `tag_id` int NOT NULL,
+  PRIMARY KEY (`expense_id`,`tag_id`),
+  KEY `fk_expense_tags_tag` (`tag_id`),
+  CONSTRAINT `fk_expense_tags_expense` FOREIGN KEY (`expense_id`) REFERENCES `expenses` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_expense_tags_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS tags (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS expenses (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  category_id INT NOT NULL,
-  supplier_id INT NULL,
-  date DATE NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  amount_nf DECIMAL(10,2) NULL,
-  amount_paid DECIMAL(10,2) NOT NULL,
-  calendar_year INT NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_exp_category FOREIGN KEY (category_id)
-    REFERENCES categories(id),
-  CONSTRAINT fk_exp_supplier FOREIGN KEY (supplier_id)
-    REFERENCES suppliers(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS expense_tags (
-  expense_id INT NOT NULL,
-  tag_id INT NOT NULL,
-  PRIMARY KEY (expense_id, tag_id),
-  CONSTRAINT fk_expense_tags_expense FOREIGN KEY (expense_id)
-    REFERENCES expenses(id) ON DELETE CASCADE,
-  CONSTRAINT fk_expense_tags_tag FOREIGN KEY (tag_id)
-    REFERENCES tags(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
