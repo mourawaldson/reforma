@@ -64,7 +64,7 @@ $chartValues = array_values($chartTotals);
         <table class="table table-sm table-striped">
             <thead>
             <tr>
-                <th>Tag</th>
+                <th>Fornecedor</th>
                 <th class="text-end">Qtd</th>
                 <th class="text-end">Total pago</th>
             </tr>
