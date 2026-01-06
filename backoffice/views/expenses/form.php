@@ -7,7 +7,7 @@
     <div class="row mb-3">
         <div class="col-md-3">
             <label for="date" class="form-label">Data</label>
-            <input type="date" class="form-control" id="date" required autofocus>
+            <input type="date" class="form-control" id="date" required autofocus value="<?php echo date('Y-m-d'); ?>">
             <div class="invalid-feedback">Informe a data da despesa.</div>
         </div>
 
