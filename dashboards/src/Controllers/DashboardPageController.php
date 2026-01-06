@@ -61,7 +61,8 @@ class DashboardPageController
 
     public function suppliers()
     {
-        $data = $this->fetchApi('dashboard/suppliers');
-        $this->render('suppliers', $data);
+        $suppliers = $this->fetchApi('dashboard/suppliers');
+        $suppliersNoExpenses = $this->fetchApi('dashboard/suppliersNoExpenses');
+        $this->render('suppliers', [$suppliers, $suppliersNoExpenses]);
     }
 }

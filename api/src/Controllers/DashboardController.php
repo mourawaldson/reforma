@@ -289,4 +289,29 @@ class DashboardController
             'table' => $table
         ]);
     }
+
+    public function suppliersNoExpenses()
+    {
+        $pdo = Database::getConnection();
+
+        // =========================
+        // FORNECEDORES SEM DESPESAS
+        // =========================
+
+        $sql = "
+            SELECT
+                s.cpf_cnpj,
+                s.name
+            FROM suppliers s
+            LEFT JOIN expenses e ON e.supplier_id = s.id AND e.is_confirmed = 1
+            WHERE e.id IS NULL
+            ORDER BY s.name ASC;
+        ";
+
+        $stmt = $pdo->query($sql);
+        $rows = $stmt->fetchAll();
+
+        header('Content-Type: application/json');
+        echo json_encode($rows);
+    }
 }

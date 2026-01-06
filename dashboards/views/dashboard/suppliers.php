@@ -1,6 +1,9 @@
 <?php
-$summary = $data['summary'] ?? ['total_paid' => 0];
-$years   = $data['years']   ?? [];
+$suppliers = $data[0] ?? [];
+$suppliersNoExpenses = $data[1] ?? [];
+
+$summary = $suppliers['summary'] ?? ['total_paid' => 0];
+$years   = $suppliers['years']   ?? [];
 
 // =========================
 // DADOS PARA O GRÁFICO
@@ -83,6 +86,55 @@ $chartValues = array_values($chartTotals);
         </table>
     </div>
 <?php endforeach; ?>
+
+<?php
+function formatCnpjCpf($value)
+{
+  $CPF_LENGTH = 11;
+  $cnpj_cpf = preg_replace("/\D/", '', $value);
+  
+  if (strlen($cnpj_cpf) === $CPF_LENGTH) {
+    return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
+  } 
+  
+  return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
+}
+?>
+
+<!-- ========================= -->
+<!-- FORNECEDORES SEM DESPESAS -->
+<!-- ========================= -->
+<div class="border-top pt-4 mt-4">
+    <h3 class="h6 mb-3">Fornecedores sem despesas</h3>
+
+    <table class="table table-sm table-striped">
+        <?php if (!empty($suppliersNoExpenses)): ?>
+            <thead>
+                <tr>
+                    <th>CNPJ</th>
+                    <th>Fornecedor</th>
+                </tr>
+            </thead>
+        <?php endif; ?>
+
+        <tbody>
+            <?php if (!empty($suppliersNoExpenses)): ?>
+                <?php foreach ($suppliersNoExpenses as $supplier): ?>
+                    <tr>
+                        <td><?= htmlspecialchars(formatCnpjCpf($supplier['cpf_cnpj'])) ?></td>
+                        <td><?= htmlspecialchars($supplier['name']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="2" class="text-center text-muted">
+                        Nenhum fornecedor encontrado.
+                    </td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
 <script>
     (function () {
