@@ -66,6 +66,6 @@ $router->add('GET', '/dashboard/expenses', [$dashboard, 'expenses']);
 $router->add('GET', '/dashboard/discounts', [$dashboard, 'discounts']);
 $router->add('GET', '/dashboard/tags', [$dashboard, 'tags']);
 $router->add('GET', '/dashboard/suppliers', [$dashboard, 'suppliers']);
-$router->add('GET', '/dashboard/suppliersNoExpenses', [$dashboard, 'suppliersNoExpenses']);
+$router->add('GET', '/dashboard/suppliersNotUsed', [$dashboard, 'suppliersNotUsed']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $uriPath);

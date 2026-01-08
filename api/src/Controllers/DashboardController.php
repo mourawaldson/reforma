@@ -290,12 +290,12 @@ class DashboardController
         ]);
     }
 
-    public function suppliersNoExpenses()
+    public function suppliersNotUsed()
     {
         $pdo = Database::getConnection();
 
         // =========================
-        // FORNECEDORES SEM DESPESAS
+        // FORNECEDORES SEM USO
         // =========================
 
         $sql = "

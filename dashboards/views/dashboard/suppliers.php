@@ -1,6 +1,6 @@
 <?php
 $suppliers = $data[0] ?? [];
-$suppliersNoExpenses = $data[1] ?? [];
+$suppliersNotUsed = $data[1] ?? [];
 
 $summary = $suppliers['summary'] ?? ['total_paid' => 0];
 $years   = $suppliers['years']   ?? [];
@@ -102,13 +102,13 @@ function formatCnpjCpf($value)
 ?>
 
 <!-- ========================= -->
-<!-- FORNECEDORES SEM DESPESAS -->
+<!-- FORNECEDORES SEM USO -->
 <!-- ========================= -->
 <div class="border-top pt-4 mt-4">
     <h3 class="h6 mb-3">Fornecedores sem despesas</h3>
 
     <table class="table table-sm table-striped">
-        <?php if (!empty($suppliersNoExpenses)): ?>
+        <?php if (!empty($suppliersNotUsed)): ?>
             <thead>
                 <tr>
                     <th>CNPJ</th>
@@ -118,8 +118,8 @@ function formatCnpjCpf($value)
         <?php endif; ?>
 
         <tbody>
-            <?php if (!empty($suppliersNoExpenses)): ?>
-                <?php foreach ($suppliersNoExpenses as $supplier): ?>
+            <?php if (!empty($suppliersNotUsed)): ?>
+                <?php foreach ($suppliersNotUsed as $supplier): ?>
                     <tr>
                         <td><?= htmlspecialchars(formatCnpjCpf($supplier['cpf_cnpj'])) ?></td>
                         <td><?= htmlspecialchars($supplier['name']) ?></td>
