@@ -65,6 +65,7 @@ $router->add('GET', '/dashboard/overview', [$dashboard, 'overview']);
 $router->add('GET', '/dashboard/expenses', [$dashboard, 'expenses']);
 $router->add('GET', '/dashboard/discounts', [$dashboard, 'discounts']);
 $router->add('GET', '/dashboard/tags', [$dashboard, 'tags']);
+$router->add('GET', '/dashboard/tagsNotUsed', [$dashboard, 'tagsNotUsed']);
 $router->add('GET', '/dashboard/suppliers', [$dashboard, 'suppliers']);
 $router->add('GET', '/dashboard/suppliersNotUsed', [$dashboard, 'suppliersNotUsed']);
 

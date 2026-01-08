@@ -55,8 +55,9 @@ class DashboardPageController
 
     public function tags()
     {
-        $data = $this->fetchApi('dashboard/tags');
-        $this->render('tags', $data);
+        $tags = $this->fetchApi('dashboard/tags');
+        $tagsNotUsed = $this->fetchApi('dashboard/tagsNotUsed');
+        $this->render('tags', [$tags, $tagsNotUsed]);
     }
 
     public function suppliers()

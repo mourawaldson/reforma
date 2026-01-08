@@ -230,6 +230,30 @@ class DashboardController
         ]);
     }
 
+    public function tagsNotUsed()
+    {
+        $pdo = Database::getConnection();
+
+        // =========================
+        // TAGS SEM USO
+        // =========================
+
+        $sql = "
+            SELECT
+                t.name
+            FROM tags t
+            LEFT JOIN expense_tags et ON et.tag_id = t.id
+            WHERE et.tag_id IS NULL
+            ORDER BY t.name ASC;
+        ";
+
+        $stmt = $pdo->query($sql);
+        $rows = $stmt->fetchAll();
+
+        header('Content-Type: application/json');
+        echo json_encode($rows);
+    }
+
     public function suppliers()
     {
         $pdo = Database::getConnection();

@@ -1,6 +1,9 @@
 <?php
-$summary = $data['summary'] ?? ['total_paid' => 0];
-$years   = $data['years']   ?? [];
+$tags = $data[0] ?? [];
+$tagsNotUsed = $data[1] ?? [];
+
+$summary = $tags['summary'] ?? ['total_paid' => 0];
+$years   = $tags['years']   ?? [];
 
 // =========================
 // DADOS PARA O GRÁFICO
@@ -77,6 +80,39 @@ $chartValues = array_values($chartTotals);
         </table>
     </div>
 <?php endforeach; ?>
+
+<!-- ========================= -->
+<!-- TAGS SEM USO -->
+<!-- ========================= -->
+<div class="border-top pt-4 mt-4">
+    <h3 class="h6 mb-3">Tags sem uso</h3>
+
+    <table class="table table-sm table-striped">
+        <?php if (!empty($tagsNotUsed)): ?>
+            <thead>
+                <tr>
+                    <th>Tag</th>
+                </tr>
+            </thead>
+        <?php endif; ?>
+
+        <tbody>
+            <?php if (!empty($tagsNotUsed)): ?>
+                <?php foreach ($tagsNotUsed as $tag): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($tag['name']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="2" class="text-center text-muted">
+                        Nenhuma tag encontrada.
+                    </td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
 <script>
     (function () {
