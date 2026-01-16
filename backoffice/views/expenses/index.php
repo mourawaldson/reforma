@@ -256,6 +256,23 @@
                 });
         });
 
+        $(document).on('click', '.btn-delete-expense', function() {
+            if (!confirm('Remover despesa?')) {
+                return;
+            }
+
+            const id = $(this).data('id');
+
+            $.ajax({
+                url: API_BASE + '/expenses/' + id,
+                method: 'DELETE',
+                success: loadExpenses,
+                error: function() {
+                    alert('Erro ao remover despesa.');
+                }
+            });
+        });
+
         loadExpenses();
     });
 </script>
