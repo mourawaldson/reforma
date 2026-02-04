@@ -5,20 +5,47 @@ $tagsNotUsed = $data[1] ?? [];
 $summary = $tags['summary'] ?? ['total_paid' => 0];
 $years   = $tags['years']   ?? [];
 
-// =========================
-// DADOS PARA O GRÁFICO
-// =========================
+/*
+=====================================
+CONSOLIDADO + DADOS DO GRÁFICO
+=====================================
+*/
 $chartTotals = [];
+$consolidated = [];
 
 foreach ($years as $yearData) {
     foreach ($yearData['tags'] as $tag) {
+
         $name = $tag['tag'];
+
         if (!isset($chartTotals[$name])) {
             $chartTotals[$name] = 0;
         }
+
+        if (!isset($consolidated[$name])) {
+            $consolidated[$name] = [
+                'count' => 0,
+                'total_paid' => 0
+            ];
+        }
+
         $chartTotals[$name] += $tag['total_paid'];
+
+        $consolidated[$name]['count'] += $tag['count'];
+        $consolidated[$name]['total_paid'] += $tag['total_paid'];
     }
 }
+
+/*
+=====================================
+ORDENA POR MAIOR GASTO
+=====================================
+*/
+uasort($chartTotals, fn($a, $b) => $b <=> $a);
+
+uasort($consolidated, fn($a, $b) =>
+    $b['total_paid'] <=> $a['total_paid']
+);
 
 $chartLabels = array_keys($chartTotals);
 $chartValues = array_values($chartTotals);
@@ -50,6 +77,32 @@ $chartValues = array_values($chartTotals);
         <canvas id="tagsChart"></canvas>
     </div>
 </div>
+
+<!-- ========================= -->
+<!-- TABELA CONSOLIDADA -->
+<!-- ========================= -->
+<h2 class="h5 mb-3">Consolidado geral (todos os anos)</h2>
+
+<table class="table table-sm table-striped mb-5">
+    <thead>
+    <tr>
+        <th>Tag</th>
+        <th class="text-end">Qtd</th>
+        <th class="text-end">Total pago</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($consolidated as $tagName => $values): ?>
+        <tr>
+            <td><?= htmlspecialchars($tagName) ?></td>
+            <td class="text-end"><?= $values['count'] ?></td>
+            <td class="text-end">
+                R$ <?= number_format($values['total_paid'], 2, ',', '.') ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
 
 <!-- ========================= -->
 <!-- ANO → TAGS -->
