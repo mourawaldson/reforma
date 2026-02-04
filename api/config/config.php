@@ -1,11 +1,11 @@
 <?php
 return [
     'db' => [
-        'host'    => 'db',
-        'name'    => 'controle_reforma',
-        'user'    => 'reforma',
-        'pass'    => 'reforma',
-        'charset' => 'utf8mb4',
+        'host' => $_ENV['DB_HOST'] ?? 'db',
+        'name' => $_ENV['DB_NAME'] ?? 'controle_reforma',
+        'user' => $_ENV['DB_USER'] ?? 'reforma',
+        'pass' => $_ENV['DB_PASS'] ?? 'reforma',
+        'charset' => $_ENV['DB_CHARSET'] ?? 'utf8mb4',
     ],
     'base_path' => '',
 ];

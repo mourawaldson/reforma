@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../Database.php';
+declare(strict_types=1);
 
 class Expense
 {
@@ -14,16 +14,16 @@ class Expense
 
         if (!empty($filters['year'])) {
             $where[] = 'e.calendar_year = :year';
-            $params['year'] = (int)$filters['year'];
+            $params['year'] = (int) $filters['year'];
         }
         if (!empty($filters['supplier_id'])) {
             $where[] = 'e.supplier_id = :supplier_id';
-            $params['supplier_id'] = (int)$filters['supplier_id'];
+            $params['supplier_id'] = (int) $filters['supplier_id'];
         }
         if (!empty($filters['tag_id'])) {
             $sql .= " JOIN expense_tags et ON et.expense_id = e.id";
             $where[] = 'et.tag_id = :tag_id';
-            $params['tag_id'] = (int)$filters['tag_id'];
+            $params['tag_id'] = (int) $filters['tag_id'];
         }
         if (!empty($filters['q'])) {
             $where[] = 'e.description LIKE :q';
@@ -55,7 +55,7 @@ class Expense
 
             while ($t = $stmt->fetch()) {
                 $tagsByExpense[$t['expense_id']][] = [
-                    'id' => (int)$t['id'],
+                    'id' => (int) $t['id'],
                     'name' => $t['name']
                 ];
             }
@@ -80,7 +80,8 @@ class Expense
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
 
-        if (!$row) return null;
+        if (!$row)
+            return null;
 
         $stmt = $pdo->prepare("
             SELECT t.id, t.name
@@ -104,7 +105,7 @@ class Expense
         ");
         $stmt->execute($data);
 
-        $id = (int)$pdo->lastInsertId();
+        $id = (int) $pdo->lastInsertId();
         self::setTags($id, $tags);
         return $id;
     }
@@ -141,7 +142,8 @@ class Expense
         $pdo->prepare("DELETE FROM expense_tags WHERE expense_id = :id")
             ->execute(['id' => $expenseId]);
 
-        if (!$tagIds) return;
+        if (!$tagIds)
+            return;
 
         $stmt = $pdo->prepare("
             INSERT INTO expense_tags (expense_id, tag_id)
@@ -151,8 +153,17 @@ class Expense
         foreach ($tagIds as $tagId) {
             $stmt->execute([
                 'expense_id' => $expenseId,
-                'tag_id' => (int)$tagId
+                'tag_id' => (int) $tagId
             ]);
         }
+    }
+
+    public static function confirm(int $id): void
+    {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare(
+            "UPDATE expenses SET is_confirmed = 1 WHERE id = :id"
+        );
+        $stmt->execute(['id' => $id]);
     }
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 class Router
 {
     private array $routes = [];
@@ -11,7 +13,8 @@ class Router
     public function dispatch(string $method, string $uriPath)
     {
         foreach ($this->routes as [$routeMethod, $pattern, $handler]) {
-            if (strtoupper($method) !== strtoupper($routeMethod)) continue;
+            if (strtoupper($method) !== strtoupper($routeMethod))
+                continue;
             $regex = '@^' . $pattern . '$@';
             if (preg_match($regex, $uriPath, $matches)) {
                 array_shift($matches);

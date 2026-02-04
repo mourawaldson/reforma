@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../Database.php';
 
 class Tag
@@ -33,7 +35,7 @@ class Tag
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("INSERT INTO tags (name) VALUES (:name)");
         $stmt->execute(['name' => $data['name']]);
-        return (int)$pdo->lastInsertId();
+        return (int) $pdo->lastInsertId();
     }
 
     public static function update(int $id, array $data): bool
@@ -42,7 +44,7 @@ class Tag
         $stmt = $pdo->prepare("UPDATE tags SET name = :name WHERE id = :id");
         return $stmt->execute([
             'name' => $data['name'],
-            'id'   => $id,
+            'id' => $id,
         ]);
     }
 

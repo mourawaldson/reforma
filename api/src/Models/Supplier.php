@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../Database.php';
 
 class Supplier
@@ -50,11 +52,11 @@ class Supplier
             VALUES (:name, :company_name, :cpf_cnpj)
         ");
         $stmt->execute([
-            'name'         => $data['name'],
+            'name' => $data['name'],
             'company_name' => $data['company_name'],
-            'cpf_cnpj'     => $data['cpf_cnpj'],
+            'cpf_cnpj' => $data['cpf_cnpj'],
         ]);
-        return (int)$pdo->lastInsertId();
+        return (int) $pdo->lastInsertId();
     }
 
     public static function update(int $id, array $data): bool
@@ -69,10 +71,10 @@ class Supplier
             WHERE id = :id
         ");
         return $stmt->execute([
-            'name'         => $data['name'],
+            'name' => $data['name'],
             'company_name' => $data['company_name'],
-            'cpf_cnpj'     => $data['cpf_cnpj'],
-            'id'           => $id,
+            'cpf_cnpj' => $data['cpf_cnpj'],
+            'id' => $id,
         ]);
     }
 

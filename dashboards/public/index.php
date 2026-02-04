@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../src/Router.php';
-require_once __DIR__ . '/../src/Controllers/DashboardPageController.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
 
 $router = new Router();
 $ctrl = new DashboardPageController();
@@ -12,7 +12,7 @@ $router->add('GET', '/dashboard/expenses', [$ctrl, 'expenses']);
 $router->add('GET', '/dashboard/tags', [$ctrl, 'tags']);
 $router->add('GET', '/dashboard/suppliers', [$ctrl, 'suppliers']);
 
-$method  = $_SERVER['REQUEST_METHOD'];
+$method = $_SERVER['REQUEST_METHOD'];
 $uriPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 /**

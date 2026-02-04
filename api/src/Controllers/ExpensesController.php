@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__ . '/../Models/Expense.php';
-require_once __DIR__ . '/../Database.php';
+declare(strict_types=1);
+
+require_once __DIR__ . '/../Validator.php';
 
 class ExpensesController
 {
@@ -14,11 +15,14 @@ class ExpensesController
     public function index()
     {
         $filters = [
-            'year'        => $_GET['year'] ?? null,
-            'supplier_id' => $_GET['supplier_id'] ?? null,
-            'tag_id'      => $_GET['tag_id'] ?? null,
-            'q'           => $_GET['q'] ?? null,
+            'year' => isset($_GET['year']) ? (int) $_GET['year'] : null,
+            'supplier_id' => isset($_GET['supplier_id']) ? (int) $_GET['supplier_id'] : null,
+            'tag_id' => isset($_GET['tag_id']) ? (int) $_GET['tag_id'] : null,
+            'q' => $_GET['q'] ?? null,
         ];
+
+        // Filter out nulls
+        $filters = array_filter($filters, fn($v) => !is_null($v));
 
         $data = Expense::list($filters);
 
@@ -28,7 +32,7 @@ class ExpensesController
 
     public function show($id)
     {
-        $exp = Expense::find((int)$id);
+        $exp = Expense::find((int) $id);
         header('Content-Type: application/json');
 
         if (!$exp) {
@@ -44,19 +48,21 @@ class ExpensesController
     {
         $data = $this->getJsonInput();
 
-        $required = ['date', 'description', 'amount_paid'];
-        foreach ($required as $field) {
-            if (!isset($data[$field])) {
-                http_response_code(400);
-                echo json_encode([
-                    'error' => "Campo {$field} é obrigatório"
-                ]);
-                return;
-            }
-        }
+        Validator::validate($data, function (Validator $v) {
+            $v->required(['date', 'description', 'amount_paid'])
+                ->numeric(['amount_paid'])
+                ->date(['date']);
+
+            // Optional numeric fields
+            $d = $v->getData();
+            if (isset($d['amount_nf']))
+                $v->numeric(['amount_nf']);
+            if (isset($d['additional_discount']))
+                $v->numeric(['additional_discount']);
+        });
 
         // Extrai ano da data (YYYY-MM-DD)
-        $calendarYear = (int)substr($data['date'], 0, 4);
+        $calendarYear = (int) substr($data['date'], 0, 4);
 
         // Regra de confirmação inicial
         $today = date('Y-m-d');
@@ -67,14 +73,14 @@ class ExpensesController
             : [];
 
         $payload = [
-            'supplier_id'         => $data['supplier_id'] ?? null,
-            'date'                => $data['date'],
-            'description'         => $data['description'],
-            'amount_nf'           => $data['amount_nf'] ?? null,
-            'amount_paid'         => (float)$data['amount_paid'],
-            'additional_discount' => $data['additional_discount'] ?? null,
-            'calendar_year'       => $calendarYear,
-            'is_confirmed'        => $isConfirmed,
+            'supplier_id' => isset($data['supplier_id']) ? (int) $data['supplier_id'] : null,
+            'date' => $data['date'],
+            'description' => $data['description'],
+            'amount_nf' => isset($data['amount_nf']) ? (float) $data['amount_nf'] : null,
+            'amount_paid' => (float) $data['amount_paid'],
+            'additional_discount' => isset($data['additional_discount']) ? (float) $data['additional_discount'] : null,
+            'calendar_year' => $calendarYear,
+            'is_confirmed' => $isConfirmed,
         ];
 
         $id = Expense::create($payload, $tags);
@@ -82,14 +88,14 @@ class ExpensesController
         header('Content-Type: application/json');
         http_response_code(201);
         echo json_encode([
-            'id'      => $id,
+            'id' => $id,
             'message' => 'Despesa criada'
         ]);
     }
 
     public function update($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if (!Expense::find($id)) {
             http_response_code(404);
@@ -99,27 +105,29 @@ class ExpensesController
 
         $data = $this->getJsonInput();
 
-        $required = ['date', 'description', 'amount_paid'];
-        foreach ($required as $field) {
-            if (!isset($data[$field])) {
-                http_response_code(400);
-                echo json_encode([
-                    'error' => "Campo {$field} é obrigatório"
-                ]);
-                return;
-            }
-        }
+        Validator::validate($data, function (Validator $v) {
+            $v->required(['date', 'description', 'amount_paid'])
+                ->numeric(['amount_paid'])
+                ->date(['date']);
 
-        $calendarYear = (int)substr($data['date'], 0, 4);
+            // Optional numeric fields
+            $d = $v->getData();
+            if (isset($d['amount_nf']))
+                $v->numeric(['amount_nf']);
+            if (isset($d['additional_discount']))
+                $v->numeric(['additional_discount']);
+        });
+
+        $calendarYear = (int) substr($data['date'], 0, 4);
 
         $payload = [
-            'supplier_id'         => $data['supplier_id'] ?? null,
-            'date'                => $data['date'],
-            'description'         => $data['description'],
-            'amount_nf'           => $data['amount_nf'] ?? null,
-            'amount_paid'         => (float)$data['amount_paid'],
-            'additional_discount' => $data['additional_discount'] ?? null,
-            'calendar_year'       => $calendarYear,
+            'supplier_id' => isset($data['supplier_id']) ? (int) $data['supplier_id'] : null,
+            'date' => $data['date'],
+            'description' => $data['description'],
+            'amount_nf' => isset($data['amount_nf']) ? (float) $data['amount_nf'] : null,
+            'amount_paid' => (float) $data['amount_paid'],
+            'additional_discount' => isset($data['additional_discount']) ? (float) $data['additional_discount'] : null,
+            'calendar_year' => $calendarYear,
         ];
 
         Expense::update($id, $payload, $data['tags'] ?? []);
@@ -130,7 +138,7 @@ class ExpensesController
 
     public function destroy($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if (!Expense::find($id)) {
             http_response_code(404);
@@ -145,13 +153,9 @@ class ExpensesController
         echo json_encode(['message' => 'Despesa removida']);
     }
 
-    /**
-     * Confirma explicitamente uma despesa pendente
-     * Rota: POST /expenses/{id}/confirm
-     */
     public function confirm($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if (!Expense::find($id)) {
             http_response_code(404);
@@ -160,11 +164,7 @@ class ExpensesController
             return;
         }
 
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare(
-            "UPDATE expenses SET is_confirmed = 1 WHERE id = :id"
-        );
-        $stmt->execute(['id' => $id]);
+        Expense::confirm($id);
 
         header('Content-Type: application/json');
         echo json_encode(['message' => 'Despesa confirmada']);

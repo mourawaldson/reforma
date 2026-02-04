@@ -10,7 +10,9 @@ DB_NAME="controle_reforma"
 DB_USER="root"
 DB_PASS="root"
 
-OUTPUT_DIR="../sql"
+# Resolve diretório do script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OUTPUT_DIR="${SCRIPT_DIR}/../sql"
 OUTPUT_FILE="${OUTPUT_DIR}/schema.sql"
 
 # Ordem correta das tabelas (pais → filhos)

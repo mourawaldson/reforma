@@ -1,5 +1,8 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../Models/Tag.php';
+require_once __DIR__ . '/../Validator.php';
 
 class TagsController
 {
@@ -19,7 +22,7 @@ class TagsController
 
     public function show($id)
     {
-        $row = Tag::find((int)$id);
+        $row = Tag::find((int) $id);
         header('Content-Type: application/json');
 
         if (!$row) {
@@ -35,11 +38,9 @@ class TagsController
     {
         $data = $this->getJsonInput();
 
-        if (empty($data['name'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'O nome é obrigatório']);
-            return;
-        }
+        Validator::validate($data, function (Validator $v) {
+            $v->required(['name']);
+        });
 
         if (Tag::findByName($data['name'])) {
             http_response_code(409);
@@ -59,7 +60,7 @@ class TagsController
 
     public function update($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
         $existing = Tag::find($id);
 
         if (!$existing) {
@@ -70,14 +71,12 @@ class TagsController
 
         $data = $this->getJsonInput();
 
-        if (empty($data['name'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'O nome é obrigatório']);
-            return;
-        }
+        Validator::validate($data, function (Validator $v) {
+            $v->required(['name']);
+        });
 
         $byName = Tag::findByName($data['name']);
-        if ($byName && (int)$byName['id'] !== $id) {
+        if ($byName && (int) $byName['id'] !== $id) {
             http_response_code(409);
             echo json_encode(['error' => 'Já existe uma tag com esse nome']);
             return;
@@ -91,7 +90,7 @@ class TagsController
 
     public function destroy($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if (!Tag::find($id)) {
             http_response_code(404);

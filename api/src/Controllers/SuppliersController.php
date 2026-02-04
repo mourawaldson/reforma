@@ -1,5 +1,8 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../Models/Supplier.php';
+require_once __DIR__ . '/../Validator.php';
 
 class SuppliersController
 {
@@ -12,7 +15,8 @@ class SuppliersController
 
     private function normalizeCpfCnpj(?string $value): ?string
     {
-        if (!$value) return null;
+        if (!$value)
+            return null;
         return preg_replace('/\D/', '', $value);
     }
 
@@ -24,7 +28,7 @@ class SuppliersController
 
     public function show($id)
     {
-        $row = Supplier::find((int)$id);
+        $row = Supplier::find((int) $id);
         header('Content-Type: application/json');
 
         if (!$row) {
@@ -40,11 +44,9 @@ class SuppliersController
     {
         $data = $this->getJsonInput();
 
-        if (empty($data['name'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Nome é obrigatório']);
-            return;
-        }
+        Validator::validate($data, function (Validator $v) {
+            $v->required(['name']);
+        });
 
         $cpfCnpj = $this->normalizeCpfCnpj($data['cpf_cnpj'] ?? null);
 
@@ -65,9 +67,9 @@ class SuppliersController
         }
 
         $id = Supplier::create([
-            'name'         => $data['name'],
+            'name' => $data['name'],
             'company_name' => $data['company_name'] ?? null,
-            'cpf_cnpj'     => $cpfCnpj,
+            'cpf_cnpj' => $cpfCnpj,
         ]);
 
         header('Content-Type: application/json');
@@ -77,7 +79,7 @@ class SuppliersController
 
     public function update($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if (!Supplier::find($id)) {
             http_response_code(404);
@@ -87,11 +89,9 @@ class SuppliersController
 
         $data = $this->getJsonInput();
 
-        if (empty($data['name'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Nome é obrigatório']);
-            return;
-        }
+        Validator::validate($data, function (Validator $v) {
+            $v->required(['name']);
+        });
 
         $cpfCnpj = $this->normalizeCpfCnpj($data['cpf_cnpj'] ?? null);
 
@@ -99,7 +99,7 @@ class SuppliersController
             $existing = Supplier::findByCpfCnpj($cpfCnpj);
 
             // se existir e NÃO for o próprio registro
-            if ($existing && (int)$existing['id'] !== $id) {
+            if ($existing && (int) $existing['id'] !== $id) {
                 $isCnpj = strlen($cpfCnpj) === 14;
 
                 http_response_code(400);
@@ -113,9 +113,9 @@ class SuppliersController
         }
 
         Supplier::update($id, [
-            'name'         => $data['name'],
+            'name' => $data['name'],
             'company_name' => $data['company_name'] ?? null,
-            'cpf_cnpj'     => $cpfCnpj,
+            'cpf_cnpj' => $cpfCnpj,
         ]);
 
         header('Content-Type: application/json');
@@ -124,7 +124,7 @@ class SuppliersController
 
     public function destroy($id)
     {
-        $id = (int)$id;
+        $id = (int) $id;
 
         if (!Supplier::find($id)) {
             http_response_code(404);

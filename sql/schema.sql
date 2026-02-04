@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS `expenses` (
   PRIMARY KEY (`id`),
   KEY `fk_exp_supplier` (`supplier_id`),
   KEY `idx_expenses_is_confirmed` (`is_confirmed`),
+  KEY `idx_expenses_calendar_year` (`calendar_year`),
+  KEY `idx_expenses_date` (`date`),
   CONSTRAINT `fk_exp_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `expense_tags` (

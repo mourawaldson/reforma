@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../Database.php';
 
 class DashboardController
@@ -8,7 +10,7 @@ class DashboardController
         $pdo = Database::getConnection();
 
         // Total acumulado (confirmadas)
-        $total = (float)$pdo->query("
+        $total = (float) $pdo->query("
             SELECT SUM(amount_paid)
             FROM expenses
             WHERE is_confirmed = 1
@@ -27,7 +29,7 @@ class DashboardController
 
         $years = [];
         foreach ($stmt->fetchAll() as $r) {
-            $years[$r['calendar_year']] = (float)$r['total_paid'];
+            $years[$r['calendar_year']] = (float) $r['total_paid'];
         }
 
         header('Content-Type: application/json');
@@ -59,9 +61,9 @@ class DashboardController
         foreach ($stmt->fetchAll() as $r) {
             $years[$r['calendar_year']] = [
                 'summary' => [
-                    'total_paid'   => (float)$r['total_paid'],
-                    'total_nf'     => (float)$r['total_nf'],
-                    'diff_nf_paid' => (float)$r['total_nf'] - (float)$r['total_paid'],
+                    'total_paid' => (float) $r['total_paid'],
+                    'total_nf' => (float) $r['total_nf'],
+                    'diff_nf_paid' => (float) $r['total_nf'] - (float) $r['total_paid'],
                 ]
             ];
         }
@@ -93,8 +95,8 @@ class DashboardController
         $pendingYears = [];
         foreach ($stmt->fetchAll() as $r) {
             $pendingYears[$r['calendar_year']] = [
-                'count'      => (int)$r['count'],
-                'total_paid' => (float)$r['total_paid'],
+                'count' => (int) $r['count'],
+                'total_paid' => (float) $r['total_paid'],
             ];
         }
 
@@ -103,8 +105,8 @@ class DashboardController
             'years' => $years,
             'pending' => [
                 'summary' => [
-                    'count'      => (int)$pendingSummary['count'],
-                    'total_paid' => (float)$pendingSummary['total_paid'],
+                    'count' => (int) $pendingSummary['count'],
+                    'total_paid' => (float) $pendingSummary['total_paid'],
                 ],
                 'years' => $pendingYears
             ]
@@ -142,29 +144,29 @@ class DashboardController
         $totalVet = 0;
 
         foreach ($rows as $r) {
-            $vet = (float)$r['amount_paid'] - (float)$r['additional_discount'];
+            $vet = (float) $r['amount_paid'] - (float) $r['additional_discount'];
 
             $items[] = [
-                'date'                => $r['date'],
-                'supplier_name'       => $r['supplier_name'],
-                'description'         => $r['description'],
-                'amount_paid'         => (float)$r['amount_paid'],
-                'additional_discount' => (float)$r['additional_discount'],
-                'vet'                 => $vet,
+                'date' => $r['date'],
+                'supplier_name' => $r['supplier_name'],
+                'description' => $r['description'],
+                'amount_paid' => (float) $r['amount_paid'],
+                'additional_discount' => (float) $r['additional_discount'],
+                'vet' => $vet,
             ];
 
-            $totalPaid     += (float)$r['amount_paid'];
-            $totalDiscount += (float)$r['additional_discount'];
-            $totalVet      += $vet;
+            $totalPaid += (float) $r['amount_paid'];
+            $totalDiscount += (float) $r['additional_discount'];
+            $totalVet += $vet;
         }
 
         header('Content-Type: application/json');
         echo json_encode([
             'items' => $items,
             'totals' => [
-                'amount_paid'         => $totalPaid,
+                'amount_paid' => $totalPaid,
                 'additional_discount' => $totalDiscount,
-                'vet'                 => $totalVet,
+                'vet' => $totalVet,
             ]
         ]);
     }
@@ -176,7 +178,7 @@ class DashboardController
         // =========================
         // TOTAL PAGO GLOBAL (confirmadas)
         // =========================
-        $totalPaid = (float)$pdo
+        $totalPaid = (float) $pdo
             ->query("SELECT SUM(amount_paid) FROM expenses WHERE is_confirmed = 1")
             ->fetchColumn();
 
@@ -204,19 +206,19 @@ class DashboardController
         $table = [];
 
         foreach ($rows as $r) {
-            $year = (int)$r['calendar_year'];
+            $year = (int) $r['calendar_year'];
 
             $years[$year]['tags'][] = [
-                'tag'        => $r['tag_name'],
-                'count'      => (int)$r['count'],
-                'total_paid' => (float)$r['total_paid'],
+                'tag' => $r['tag_name'],
+                'count' => (int) $r['count'],
+                'total_paid' => (float) $r['total_paid'],
             ];
 
             $table[] = [
-                'year'       => $year,
-                'tag'        => $r['tag_name'],
-                'count'      => (int)$r['count'],
-                'total_paid' => (float)$r['total_paid'],
+                'year' => $year,
+                'tag' => $r['tag_name'],
+                'count' => (int) $r['count'],
+                'total_paid' => (float) $r['total_paid'],
             ];
         }
 
@@ -261,7 +263,7 @@ class DashboardController
         // =========================
         // TOTAL PAGO GLOBAL (confirmadas)
         // =========================
-        $totalPaid = (float)$pdo
+        $totalPaid = (float) $pdo
             ->query("SELECT SUM(amount_paid) FROM expenses WHERE is_confirmed = 1")
             ->fetchColumn();
 
@@ -288,19 +290,19 @@ class DashboardController
         $table = [];
 
         foreach ($rows as $r) {
-            $year = (int)$r['calendar_year'];
+            $year = (int) $r['calendar_year'];
 
             $years[$year]['suppliers'][] = [
-                'supplier'   => $r['supplier_name'],
-                'count'      => (int)$r['count'],
-                'total_paid' => (float)$r['total_paid'],
+                'supplier' => $r['supplier_name'],
+                'count' => (int) $r['count'],
+                'total_paid' => (float) $r['total_paid'],
             ];
 
             $table[] = [
-                'year'       => $year,
-                'supplier'   => $r['supplier_name'],
-                'count'      => (int)$r['count'],
-                'total_paid' => (float)$r['total_paid'],
+                'year' => $year,
+                'supplier' => $r['supplier_name'],
+                'count' => (int) $r['count'],
+                'total_paid' => (float) $r['total_paid'],
             ];
         }
 
