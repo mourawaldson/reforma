@@ -23,10 +23,10 @@ $(function() {
         }
 
         function loadOptions() {
-            $.getJSON(API_BASE + '/suppliers', function(data) {
+            const suppliersRequest = $.getJSON(API_BASE + '/suppliers').done(function(suppliers) {
                 const $sel = $('#supplier_id');
 
-                data.forEach(function(s) {
+                suppliers.forEach(function(s) {
                     let label = s.display_name || '';
 
                     if (s.cpf_cnpj) {
@@ -39,12 +39,14 @@ $(function() {
                 });
             });
 
-            $.getJSON(API_BASE + '/tags', function(data) {
-                const $sel = $('#tags_select');
-                data.forEach(function(t) {
-                    $sel.append('<option value="' + t.id + '">' + t.name + '</option>');
+            const tagsRequest = $.getJSON(API_BASE + '/tags').done(function(tags) {
+                const $tagSelect = $('#tags_select');
+                tags.forEach(function(t) {
+                    $tagSelect.append('<option value="' + t.id + '">' + t.name + '</option>');
                 });
             });
+
+            return $.when(suppliersRequest, tagsRequest);
         }
 
         function loadExpense(id) {
@@ -68,10 +70,9 @@ $(function() {
             });
         }
 
-        loadOptions();
-        if (id) {
-            setTimeout(function() { loadExpense(id); }, 300);
-        }
+        loadOptions().always(function() {
+            if (id) loadExpense(id);
+        });
 
         $('#expense-form').on('submit', function(e) {
             e.preventDefault();

@@ -4,6 +4,7 @@ class ExpensesController
     public function index()
     {
         $pageTitle = 'Despesas - Backoffice';
+        $loadDataTables = true;
         include __DIR__ . '/../../views/layout/header.php';
         include __DIR__ . '/../../views/expenses/index.php';
         include __DIR__ . '/../../views/layout/footer.php';

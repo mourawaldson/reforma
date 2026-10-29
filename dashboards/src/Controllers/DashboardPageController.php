@@ -47,24 +47,18 @@ class DashboardPageController
     {
         $data = $this->fetchApi('dashboard/expenses');
 
-        $discounts = $this->fetchApi('dashboard/discounts');
-
-        $data['discounts'] = $discounts;
-
         $this->render('expenses', $data);
     }
 
     public function tags()
     {
         $tags = $this->fetchApi('dashboard/tags');
-        $tagsNotUsed = $this->fetchApi('dashboard/tagsNotUsed');
-        $this->render('tags', [$tags, $tagsNotUsed]);
+        $this->render('tags', [$tags, $tags['unused'] ?? []]);
     }
 
     public function suppliers()
     {
         $suppliers = $this->fetchApi('dashboard/suppliers');
-        $suppliersNotUsed = $this->fetchApi('dashboard/suppliersNotUsed');
-        $this->render('suppliers', [$suppliers, $suppliersNotUsed]);
+        $this->render('suppliers', [$suppliers, $suppliers['unused'] ?? []]);
     }
 }

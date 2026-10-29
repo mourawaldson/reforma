@@ -145,17 +145,18 @@ class Expense
         if (!$tagIds)
             return;
 
-        $stmt = $pdo->prepare("
-            INSERT INTO expense_tags (expense_id, tag_id)
-            VALUES (:expense_id, :tag_id)
-        ");
-
+        $values = [];
+        $params = [];
         foreach ($tagIds as $tagId) {
-            $stmt->execute([
-                'expense_id' => $expenseId,
-                'tag_id' => (int) $tagId
-            ]);
+            $values[] = '(?, ?)';
+            $params[] = $expenseId;
+            $params[] = (int) $tagId;
         }
+
+        $stmt = $pdo->prepare(
+            'INSERT INTO expense_tags (expense_id, tag_id) VALUES ' . implode(', ', $values)
+        );
+        $stmt->execute($params);
     }
 
     public static function confirm(int $id): void

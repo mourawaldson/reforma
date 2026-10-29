@@ -73,16 +73,6 @@ class DashboardController
         // =========================
         $stmt = $pdo->query("
             SELECT
-                COUNT(*) AS count,
-                SUM(amount_paid) AS total_paid
-            FROM expenses
-            WHERE is_confirmed = 0
-        ");
-
-        $pendingSummary = $stmt->fetch();
-
-        $stmt = $pdo->query("
-            SELECT
                 calendar_year,
                 COUNT(*) AS count,
                 SUM(amount_paid) AS total_paid
@@ -93,10 +83,16 @@ class DashboardController
         ");
 
         $pendingYears = [];
+        $pendingCount = 0;
+        $pendingTotalPaid = 0.0;
         foreach ($stmt->fetchAll() as $r) {
+            $count = (int) $r['count'];
+            $totalPaid = (float) $r['total_paid'];
+            $pendingCount += $count;
+            $pendingTotalPaid += $totalPaid;
             $pendingYears[$r['calendar_year']] = [
-                'count' => (int) $r['count'],
-                'total_paid' => (float) $r['total_paid'],
+                'count' => $count,
+                'total_paid' => $totalPaid,
             ];
         }
 
@@ -138,14 +134,15 @@ class DashboardController
             ];
         }
         ksort($capitalIncreaseYears, SORT_NUMERIC);
+        $discounts = $this->getDiscountsData($pdo);
 
         header('Content-Type: application/json');
         echo json_encode([
             'years' => $years,
             'pending' => [
                 'summary' => [
-                    'count' => (int) $pendingSummary['count'],
-                    'total_paid' => (float) $pendingSummary['total_paid'],
+                    'count' => $pendingCount,
+                    'total_paid' => $pendingTotalPaid,
                 ],
                 'years' => $pendingYears
             ],
@@ -157,6 +154,7 @@ class DashboardController
                 'years' => $capitalIncreaseYears,
                 'items' => $capitalIncreaseItems,
             ],
+            'discounts' => $discounts,
         ]);
     }
 
@@ -166,6 +164,13 @@ class DashboardController
     public function discounts()
     {
         $pdo = Database::getConnection();
+
+        header('Content-Type: application/json');
+        echo json_encode($this->getDiscountsData($pdo));
+    }
+
+    private function getDiscountsData(PDO $pdo): array
+    {
 
         $sql = "
             SELECT
@@ -207,15 +212,14 @@ class DashboardController
             $totalVet += $vet;
         }
 
-        header('Content-Type: application/json');
-        echo json_encode([
+        return [
             'items' => $items,
             'totals' => [
                 'amount_paid' => $totalPaid,
                 'additional_discount' => $totalDiscount,
                 'vet' => $totalVet,
             ]
-        ]);
+        ];
     }
 
     public function tags()
@@ -275,8 +279,22 @@ class DashboardController
                 'total_paid' => $totalPaid
             ],
             'years' => $years,
-            'table' => $table
+            'table' => $table,
+            'unused' => $this->getUnusedTags($pdo),
         ]);
+    }
+
+    private function getUnusedTags(PDO $pdo): array
+    {
+        $stmt = $pdo->query("
+            SELECT t.name
+            FROM tags t
+            LEFT JOIN expense_tags et ON et.tag_id = t.id
+            WHERE et.tag_id IS NULL
+            ORDER BY t.name ASC
+        ");
+
+        return $stmt->fetchAll();
     }
 
     public function tagsNotUsed()
@@ -287,20 +305,8 @@ class DashboardController
         // TAGS SEM USO
         // =========================
 
-        $sql = "
-            SELECT
-                t.name
-            FROM tags t
-            LEFT JOIN expense_tags et ON et.tag_id = t.id
-            WHERE et.tag_id IS NULL
-            ORDER BY t.name ASC;
-        ";
-
-        $stmt = $pdo->query($sql);
-        $rows = $stmt->fetchAll();
-
         header('Content-Type: application/json');
-        echo json_encode($rows);
+        echo json_encode($this->getUnusedTags($pdo));
     }
 
     public function suppliers()
@@ -359,8 +365,22 @@ class DashboardController
                 'total_paid' => $totalPaid
             ],
             'years' => $years,
-            'table' => $table
+            'table' => $table,
+            'unused' => $this->getUnusedSuppliers($pdo),
         ]);
+    }
+
+    private function getUnusedSuppliers(PDO $pdo): array
+    {
+        $stmt = $pdo->query("
+            SELECT s.cpf_cnpj, s.name
+            FROM suppliers s
+            LEFT JOIN expenses e ON e.supplier_id = s.id AND e.is_confirmed = 1
+            WHERE e.id IS NULL
+            ORDER BY s.name ASC
+        ");
+
+        return $stmt->fetchAll();
     }
 
     public function suppliersNotUsed()
@@ -371,20 +391,7 @@ class DashboardController
         // FORNECEDORES SEM USO
         // =========================
 
-        $sql = "
-            SELECT
-                s.cpf_cnpj,
-                s.name
-            FROM suppliers s
-            LEFT JOIN expenses e ON e.supplier_id = s.id AND e.is_confirmed = 1
-            WHERE e.id IS NULL
-            ORDER BY s.name ASC;
-        ";
-
-        $stmt = $pdo->query($sql);
-        $rows = $stmt->fetchAll();
-
         header('Content-Type: application/json');
-        echo json_encode($rows);
+        echo json_encode($this->getUnusedSuppliers($pdo));
     }
 }
