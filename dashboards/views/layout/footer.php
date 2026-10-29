@@ -1,9 +1,4 @@
 </div>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .catch(function(e){ console.log('SW failed', e); });
-}
-</script>
+<script src="/assets/js/dashboard.js"></script>
 </body>
 </html>

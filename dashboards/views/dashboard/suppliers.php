@@ -53,7 +53,11 @@ $chartValues = array_values($chartTotals);
 
 <div class="card mb-5">
     <div class="card-body">
-        <canvas id="suppliersChart"></canvas>
+        <canvas id="suppliersChart"
+                data-chart-labels="<?= htmlspecialchars(json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-values="<?= htmlspecialchars(json_encode($chartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-label="Total pago"
+                data-chart-color="#86efac"></canvas>
     </div>
 </div>
 
@@ -142,28 +146,3 @@ function formatCnpjCpf($value)
         </tbody>
     </table>
 </div>
-
-<script>
-    (function () {
-        const ctx = document.getElementById('suppliersChart');
-        if (!ctx) return;
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode($chartLabels) ?>,
-                datasets: [{
-                    label: 'Total pago',
-                    data: <?= json_encode($chartValues) ?>,
-                    backgroundColor: '#86efac'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    })();
-</script>

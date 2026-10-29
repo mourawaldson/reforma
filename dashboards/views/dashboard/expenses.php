@@ -146,7 +146,11 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
 <div class="card mb-5">
     <div class="card-body">
-        <canvas id="confirmedYearChart"></canvas>
+        <canvas id="confirmedYearChart"
+                data-chart-labels="<?= htmlspecialchars(json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-values="<?= htmlspecialchars(json_encode($chartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-label="Total Pago"
+                data-chart-color="#93c5fd"></canvas>
     </div>
 </div>
 
@@ -237,7 +241,11 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     <?php if (!empty($capitalIncreaseYears)): ?>
         <div class="card mb-4">
             <div class="card-body">
-                <canvas id="capitalIncreaseChart"></canvas>
+                <canvas id="capitalIncreaseChart"
+                        data-chart-labels="<?= htmlspecialchars(json_encode($capitalIncreaseChartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                        data-chart-values="<?= htmlspecialchars(json_encode($capitalIncreaseChartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                        data-chart-label="Total pago"
+                        data-chart-color="#86efac"></canvas>
             </div>
         </div>
     <?php else: ?>
@@ -341,47 +349,4 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     <p class="text-muted">Não há despesas com desconto para exibir.</p>
 <?php endif; ?>
 
-<script>
-    (function () {
-        const capitalIncreaseCtx = document.getElementById('capitalIncreaseChart');
-        if (capitalIncreaseCtx) {
-            new Chart(capitalIncreaseCtx, {
-                type: 'bar',
-                data: {
-                    labels: <?php echo json_encode($capitalIncreaseChartLabels); ?>,
-                    datasets: [{
-                        label: 'Total pago',
-                        data: <?php echo json_encode($capitalIncreaseChartValues); ?>,
-                        backgroundColor: '#86efac'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        }
-
-        const ctx = document.getElementById('confirmedYearChart');
-        if (!ctx) return;
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($chartLabels); ?>,
-                datasets: [{
-                    label: 'Total Pago',
-                    data: <?php echo json_encode($chartValues); ?>,
-                    backgroundColor: '#93c5fd'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    })();
-</script>
 </div>
