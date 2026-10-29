@@ -1,0 +1,59 @@
+.container.mb-5 {
+    font-size: .9rem;
+}
+
+.container.mb-5 h1.h3 { font-size: 1.5rem; }
+.container.mb-5 h2.h5 { font-size: 1.05rem; }
+.container.mb-5 h3.h5 { font-size: 1rem; }
+.container.mb-5 h3.h6 { font-size: .9rem; }
+
+.container.mb-5 .card h2,
+.container.mb-5 .card h3 {
+    font-size: 1.35rem;
+}
+
+.container.mb-5 .card h6 {
+    font-size: .85rem;
+}
+
+.dashboard-table {
+    --bs-table-bg: transparent;
+    border: 1px solid #dee2e6;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: .5rem;
+    font-size: .8rem;
+    overflow: hidden;
+}
+
+.dashboard-table > :not(caption) > * > * {
+    padding: .35rem .5rem;
+}
+
+.dashboard-table thead {
+    --bs-table-bg: #fff;
+    --bs-table-color: #6c757d;
+}
+
+.dashboard-table thead th {
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.dashboard-table tbody td {
+    background-color: #fff;
+}
+
+.dashboard-table thead th:first-child { border-top-left-radius: .45rem; }
+.dashboard-table thead th:last-child { border-top-right-radius: .45rem; }
+.dashboard-table tbody tr:last-child td:first-child { border-bottom-left-radius: .45rem; }
+.dashboard-table tbody tr:last-child td:last-child { border-bottom-right-radius: .45rem; }
+
+.dashboard-table tfoot tr {
+    --bs-table-bg: #eaf2ff;
+    --bs-table-striped-bg: #eaf2ff;
+    --bs-table-color: #212529;
+}
+
+.dashboard-table tfoot th:first-child { border-bottom-left-radius: .45rem; }
+.dashboard-table tfoot th:last-child { border-bottom-right-radius: .45rem; }

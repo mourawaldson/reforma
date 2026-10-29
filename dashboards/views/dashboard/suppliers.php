@@ -64,7 +64,7 @@ $chartValues = array_values($chartTotals);
     <div class="border-top pt-4 mt-4">
         <h3 class="h6 mb-3">Ano <?= htmlspecialchars($year) ?></h3>
 
-        <table class="table table-sm table-striped">
+        <table class="table table-sm dashboard-table">
             <thead>
             <tr>
                 <th>Fornecedor</th>
@@ -114,7 +114,7 @@ function formatCnpjCpf($value)
 <div class="border-top pt-4 mt-4">
     <h3 class="h6 mb-3">Fornecedores sem despesas</h3>
 
-    <table class="table table-sm table-striped">
+    <table class="table table-sm dashboard-table">
         <?php if (!empty($suppliersNotUsed)): ?>
             <thead>
                 <tr>

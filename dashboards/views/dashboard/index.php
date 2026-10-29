@@ -6,7 +6,7 @@ $chartLabels = array_keys($years);
 $chartValues = array_values($years);
 ?>
 
-<h1 class="h3 mb-4">Visão Geral – Custo do Imóvel (IR)</h1>
+<h1 class="h3 mb-4">Visão Geral</h1>
 
 <!-- ========================= -->
 <!-- CARD PRINCIPAL -->
@@ -15,7 +15,7 @@ $chartValues = array_values($years);
     <div class="col-md-6">
         <div class="card" style="background:#dcfce7;border:none;">
             <div class="card-body">
-                <h6>Custo total acrescível ao imóvel</h6>
+                <h6>Custo Total</h6>
                 <h2 class="mb-0">
                     R$ <?= number_format($total, 2, ',', '.') ?>
                 </h2>
@@ -27,13 +27,13 @@ $chartValues = array_values($years);
 <!-- ========================= -->
 <!-- TABELA POR ANO (CLEAN) -->
 <!-- ========================= -->
-<h2 class="h5 mb-3">Valor acrescível por ano</h2>
+<h2 class="h5 mb-3">Total por Ano</h2>
 
-<table class="table table-sm" style="max-width:420px;">
+<table class="table table-sm dashboard-table" style="max-width:420px;">
     <thead>
     <tr>
         <th>Ano</th>
-        <th class="text-end">Valor acrescível</th>
+        <th class="text-end">Valor Total</th>
     </tr>
     </thead>
     <tbody>
@@ -77,7 +77,7 @@ $chartValues = array_values($years);
             data: {
                 labels: <?= json_encode($chartLabels) ?>,
                 datasets: [{
-                    label: 'Valor acrescível',
+                    label: 'Valor Total',
                     data: <?= json_encode($chartValues) ?>,
                     backgroundColor: '#86efac'
                 }]

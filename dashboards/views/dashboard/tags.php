@@ -83,7 +83,7 @@ $chartValues = array_values($chartTotals);
 <!-- ========================= -->
 <h2 class="h5 mb-3">Consolidado geral (todos os anos)</h2>
 
-<table class="table table-sm table-striped mb-5">
+<table class="table table-sm dashboard-table mb-5">
     <thead>
     <tr>
         <th>Tag</th>
@@ -111,7 +111,7 @@ $chartValues = array_values($chartTotals);
     <div class="border-top pt-4 mt-4">
         <h3 class="h6 mb-3">Ano <?= htmlspecialchars($year) ?></h3>
 
-        <table class="table table-sm table-striped">
+        <table class="table table-sm dashboard-table">
             <thead>
             <tr>
                 <th>Tag</th>
@@ -140,7 +140,7 @@ $chartValues = array_values($chartTotals);
 <div class="border-top pt-4 mt-4">
     <h3 class="h6 mb-3">Tags sem uso</h3>
 
-    <table class="table table-sm table-striped">
+    <table class="table table-sm dashboard-table">
         <?php if (!empty($tagsNotUsed)): ?>
             <thead>
                 <tr>
