@@ -5,6 +5,8 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
+require_once __DIR__ . '/../../../dashboards/src/Helpers.php';
+
 class DashboardOptionalFieldsTest extends TestCase
 {
     public function testSupplierDashboardDisplaysDashForMissingCpfCnpj(): void
@@ -16,9 +18,9 @@ class DashboardOptionalFieldsTest extends TestCase
         $html = ob_get_clean();
 
         $this->assertStringContainsString('<td>-</td>', $html);
-        $this->assertSame('-', \formatCnpjCpf(null));
-        $this->assertSame('-', \formatCnpjCpf('   '));
-        $this->assertSame('123.456.789-01', \formatCnpjCpf('12345678901'));
+        $this->assertSame('-', \Dashboard\Support\formatCnpjCpf(null));
+        $this->assertSame('-', \Dashboard\Support\formatCnpjCpf('   '));
+        $this->assertSame('123.456.789-01', \Dashboard\Support\formatCnpjCpf('12345678901'));
     }
 
     public function testExpenseDashboardDisplaysDashForMissingOptionalValuesAndPreservesZero(): void

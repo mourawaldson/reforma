@@ -76,7 +76,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
         <div class="card dashboard-card dashboard-card--neutral">
             <div class="card-body">
                 <h6>Total</h6>
-                <h3>R$ <?php echo number_format($pending['summary']['total_paid'], 2, ',', '.'); ?></h3>
+                <h3><?php echo \Dashboard\Support\formatCurrencyBR($pending['summary']['total_paid']); ?></h3>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
 <?php foreach ($pending['years'] as $year => $p): ?>
     <div class="border-top pt-4 mt-4">
-        <h3 class="h6 mb-3">Ano <?php echo htmlspecialchars($year); ?> – Pendentes</h3>
+        <h3 class="h6 mb-3">Ano <?php echo \Dashboard\Support\escapeHtml($year); ?> – Pendentes</h3>
 
         <div class="row mb-4">
             <div class="col-md-6">
@@ -100,7 +100,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
                 <div class="card dashboard-card dashboard-card--neutral">
                     <div class="card-body">
                         <h6>Total</h6>
-                        <h3>R$ <?php echo number_format($p['total_paid'], 2, ',', '.'); ?></h3>
+                        <h3><?php echo \Dashboard\Support\formatCurrencyBR($p['total_paid']); ?></h3>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
         <div class="card dashboard-card dashboard-card--invoice">
             <div class="card-body">
                 <h6>Total NF (Geral)</h6>
-                <h3>R$ <?php echo number_format($overallNf, 2, ',', '.'); ?></h3>
+                <h3><?php echo \Dashboard\Support\formatCurrencyBR($overallNf); ?></h3>
             </div>
         </div>
     </div>
@@ -127,7 +127,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
         <div class="card dashboard-card dashboard-card--paid">
             <div class="card-body">
                 <h6>Total Pago (Geral)</h6>
-                <h3>R$ <?php echo number_format($overallPaid, 2, ',', '.'); ?></h3>
+                <h3><?php echo \Dashboard\Support\formatCurrencyBR($overallPaid); ?></h3>
             </div>
         </div>
     </div>
@@ -136,7 +136,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
         <div class="card dashboard-card dashboard-card--difference">
             <div class="card-body">
                 <h6>Diferença (NF - Pago)</h6>
-                <h3>R$ <?php echo number_format($overallDiff, 2, ',', '.'); ?></h3>
+                <h3><?php echo \Dashboard\Support\formatCurrencyBR($overallDiff); ?></h3>
             </div>
         </div>
     </div>
@@ -147,8 +147,8 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 <div class="card mb-5">
     <div class="card-body">
         <canvas id="confirmedYearChart"
-                data-chart-labels="<?= htmlspecialchars(json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
-                data-chart-values="<?= htmlspecialchars(json_encode($chartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-labels="<?= \Dashboard\Support\jsonForHtmlAttribute($chartLabels) ?>"
+                data-chart-values="<?= \Dashboard\Support\jsonForHtmlAttribute($chartValues) ?>"
                 data-chart-label="Total Pago"
                 data-chart-color="#93c5fd"></canvas>
     </div>
@@ -163,14 +163,14 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     $diff = (float)$summary['total_nf'] - (float)$summary['total_paid'];
     ?>
     <div class="border-top pt-4 mt-4">
-        <h3 class="h6 mb-3">Ano <?php echo htmlspecialchars($year); ?> – Confirmadas</h3>
+        <h3 class="h6 mb-3">Ano <?php echo \Dashboard\Support\escapeHtml($year); ?> – Confirmadas</h3>
 
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card dashboard-card dashboard-card--invoice">
                     <div class="card-body">
                         <h6>Total NF</h6>
-                        <h3>R$ <?php echo number_format($summary['total_nf'], 2, ',', '.'); ?></h3>
+                        <h3><?php echo \Dashboard\Support\formatCurrencyBR($summary['total_nf']); ?></h3>
                     </div>
                 </div>
             </div>
@@ -179,7 +179,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
                 <div class="card dashboard-card dashboard-card--paid">
                     <div class="card-body">
                         <h6>Total Pago</h6>
-                        <h3>R$ <?php echo number_format($summary['total_paid'], 2, ',', '.'); ?></h3>
+                        <h3><?php echo \Dashboard\Support\formatCurrencyBR($summary['total_paid']); ?></h3>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
                 <div class="card dashboard-card dashboard-card--attention">
                     <div class="card-body">
                         <h6>Diferença</h6>
-                        <h3>R$ <?php echo number_format($diff, 2, ',', '.'); ?></h3>
+                        <h3><?php echo \Dashboard\Support\formatCurrencyBR($diff); ?></h3>
                     </div>
                 </div>
             </div>
@@ -208,7 +208,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             <div class="card dashboard-card dashboard-card--paid">
                 <div class="card-body">
                     <h6>Total pago</h6>
-                    <h3>R$ <?php echo number_format((float)($capitalIncrease['summary']['total_paid'] ?? 0), 2, ',', '.'); ?></h3>
+                    <h3><?php echo \Dashboard\Support\formatCurrencyBR($capitalIncrease['summary']['total_paid'] ?? 0); ?></h3>
                 </div>
             </div>
         </div>
@@ -228,8 +228,8 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
                 <div class="col-sm-6 col-lg-4 mb-3">
                     <div class="card dashboard-card dashboard-card--paid h-100">
                         <div class="card-body">
-                            <h6>Ano <?php echo htmlspecialchars((string)$year); ?></h6>
-                            <h3>R$ <?php echo number_format((float)$totalPaid, 2, ',', '.'); ?></h3>
+                            <h6>Ano <?php echo \Dashboard\Support\escapeHtml((string)$year); ?></h6>
+                            <h3><?php echo \Dashboard\Support\formatCurrencyBR($totalPaid); ?></h3>
                         </div>
                     </div>
                 </div>
@@ -242,8 +242,8 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
         <div class="card mb-4">
             <div class="card-body">
                 <canvas id="capitalIncreaseChart"
-                        data-chart-labels="<?= htmlspecialchars(json_encode($capitalIncreaseChartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
-                        data-chart-values="<?= htmlspecialchars(json_encode($capitalIncreaseChartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                        data-chart-labels="<?= \Dashboard\Support\jsonForHtmlAttribute($capitalIncreaseChartLabels) ?>"
+                        data-chart-values="<?= \Dashboard\Support\jsonForHtmlAttribute($capitalIncreaseChartValues) ?>"
                         data-chart-label="Total pago"
                         data-chart-color="#86efac"></canvas>
             </div>
@@ -273,16 +273,16 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
                 <?php foreach ($capitalIncreaseItems as $item): ?>
                     <tr>
                         <td><?php echo !empty($item['date']) ? date('d/m/Y', strtotime($item['date'])) : '-'; ?></td>
-                        <td class="col-supplier text-start"><?php echo htmlspecialchars($item['supplier_name'] ?? '-') ?: '-'; ?></td>
-                        <td class="col-description"><?php echo htmlspecialchars($item['description'] ?? '-') ?: '-'; ?></td>
-                        <td class="text-end col-paid">R$ <?php echo number_format((float)($item['amount_paid'] ?? 0), 2, ',', '.'); ?></td>
+                        <td class="col-supplier text-start"><?php echo \Dashboard\Support\escapeHtml($item['supplier_name'] ?? '-') ?: '-'; ?></td>
+                        <td class="col-description"><?php echo \Dashboard\Support\escapeHtml($item['description'] ?? '-') ?: '-'; ?></td>
+                        <td class="text-end col-paid"><?php echo \Dashboard\Support\formatCurrencyBR($item['amount_paid'] ?? 0); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                 <tr>
                     <th colspan="3">Total pago</th>
-                    <th class="text-end col-paid">R$ <?php echo number_format((float)($capitalIncrease['summary']['total_paid'] ?? 0), 2, ',', '.'); ?></th>
+                    <th class="text-end col-paid"><?php echo \Dashboard\Support\formatCurrencyBR($capitalIncrease['summary']['total_paid'] ?? 0); ?></th>
                 </tr>
                 </tfoot>
             </table>
@@ -312,19 +312,19 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             <?php foreach ($discounts['items'] as $row): ?>
                 <tr>
                     <td><?php echo !empty($row['date']) ? date('d/m/Y', strtotime($row['date'])) : '-'; ?></td>
-                    <td class="text-start"><?php echo htmlspecialchars($row['supplier_name'] ?? '-') ?: '-'; ?></td>
+                    <td class="text-start"><?php echo \Dashboard\Support\escapeHtml($row['supplier_name'] ?? '-') ?: '-'; ?></td>
                     <td class="col-description"
-                        title="<?php echo htmlspecialchars($row['description'] ?? '-'); ?>">
-                        <?php echo htmlspecialchars($row['description'] ?? '-') ?: '-'; ?>
+                        title="<?php echo \Dashboard\Support\escapeHtml($row['description'] ?? '-'); ?>">
+                        <?php echo \Dashboard\Support\escapeHtml($row['description'] ?? '-') ?: '-'; ?>
                     </td>
                     <td class="text-end">
-                        <?php echo isset($row['amount_paid']) && $row['amount_paid'] !== '' ? 'R$ ' . number_format((float)$row['amount_paid'], 2, ',', '.') : '-'; ?>
+                        <?php echo \Dashboard\Support\formatOptionalCurrencyBR($row['amount_paid'] ?? null); ?>
                     </td>
                     <td class="text-end">
-                        <?php echo isset($row['additional_discount']) && $row['additional_discount'] !== '' ? 'R$ ' . number_format((float)$row['additional_discount'], 2, ',', '.') : '-'; ?>
+                        <?php echo \Dashboard\Support\formatOptionalCurrencyBR($row['additional_discount'] ?? null); ?>
                     </td>
                     <td class="text-end vet-value">
-                        <?php echo isset($row['vet']) && $row['vet'] !== '' ? 'R$ ' . number_format((float)$row['vet'], 2, ',', '.') : '-'; ?>
+                        <?php echo \Dashboard\Support\formatOptionalCurrencyBR($row['vet'] ?? null); ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -333,13 +333,13 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             <tr>
                 <th colspan="3" class="text-end">Totais</th>
                 <th class="text-end">
-                    R$ <?php echo number_format($discounts['totals']['amount_paid'], 2, ',', '.'); ?>
+                    <?php echo \Dashboard\Support\formatCurrencyBR($discounts['totals']['amount_paid']); ?>
                 </th>
                 <th class="text-end">
-                    R$ <?php echo number_format($discounts['totals']['additional_discount'], 2, ',', '.'); ?>
+                    <?php echo \Dashboard\Support\formatCurrencyBR($discounts['totals']['additional_discount']); ?>
                 </th>
                 <th class="text-end vet-value">
-                    R$ <?php echo number_format($discounts['totals']['vet'], 2, ',', '.'); ?>
+                    <?php echo \Dashboard\Support\formatCurrencyBR($discounts['totals']['vet']); ?>
                 </th>
             </tr>
             </tfoot>

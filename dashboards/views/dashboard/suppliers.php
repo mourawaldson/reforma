@@ -40,7 +40,7 @@ $chartValues = array_values($chartTotals);
         <div class="card dashboard-card dashboard-card--paid">
             <div class="card-body">
                 <h6>Total pago (confirmadas)</h6>
-                <h3>R$ <?= number_format($summary['total_paid'], 2, ',', '.') ?></h3>
+                <h3><?= \Dashboard\Support\formatCurrencyBR($summary['total_paid']) ?></h3>
             </div>
         </div>
     </div>
@@ -54,8 +54,8 @@ $chartValues = array_values($chartTotals);
 <div class="card mb-5">
     <div class="card-body">
         <canvas id="suppliersChart"
-                data-chart-labels="<?= htmlspecialchars(json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
-                data-chart-values="<?= htmlspecialchars(json_encode($chartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-labels="<?= \Dashboard\Support\jsonForHtmlAttribute($chartLabels) ?>"
+                data-chart-values="<?= \Dashboard\Support\jsonForHtmlAttribute($chartValues) ?>"
                 data-chart-label="Total pago"
                 data-chart-color="#86efac"></canvas>
     </div>
@@ -66,7 +66,7 @@ $chartValues = array_values($chartTotals);
 <!-- ========================= -->
 <?php foreach ($years as $year => $yearData): ?>
     <div class="border-top pt-4 mt-4">
-        <h3 class="h6 mb-3">Ano <?= htmlspecialchars($year) ?></h3>
+        <h3 class="h6 mb-3">Ano <?= \Dashboard\Support\escapeHtml($year) ?></h3>
 
         <table class="table table-sm dashboard-table">
             <thead>
@@ -79,10 +79,10 @@ $chartValues = array_values($chartTotals);
             <tbody>
             <?php foreach ($yearData['suppliers'] as $supplier): ?>
                 <tr>
-                    <td><?= htmlspecialchars($supplier['supplier']) ?></td>
+                    <td><?= \Dashboard\Support\escapeHtml($supplier['supplier']) ?></td>
                     <td class="text-end"><?= $supplier['count'] ?></td>
                     <td class="text-end">
-                        R$ <?= number_format($supplier['total_paid'], 2, ',', '.') ?>
+                        <?= \Dashboard\Support\formatCurrencyBR($supplier['total_paid']) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -90,27 +90,6 @@ $chartValues = array_values($chartTotals);
         </table>
     </div>
 <?php endforeach; ?>
-
-<?php
-function formatCnpjCpf($value)
-{
-  $CPF_LENGTH = 11;
-  if (!is_string($value) || trim($value) === '') {
-    return '-';
-  }
-
-  $cnpj_cpf = preg_replace("/\D/", '', $value);
-  if ($cnpj_cpf === '') {
-    return '-';
-  }
-  
-  if (strlen($cnpj_cpf) === $CPF_LENGTH) {
-    return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
-  } 
-  
-  return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
-}
-?>
 
 <!-- ========================= -->
 <!-- FORNECEDORES SEM USO -->
@@ -132,8 +111,8 @@ function formatCnpjCpf($value)
             <?php if (!empty($suppliersNotUsed)): ?>
                 <?php foreach ($suppliersNotUsed as $supplier): ?>
                     <tr>
-                        <td><?= htmlspecialchars(formatCnpjCpf($supplier['cpf_cnpj'] ?? null)) ?></td>
-                        <td><?= htmlspecialchars($supplier['name'] ?? '-') ?></td>
+                        <td><?= \Dashboard\Support\escapeHtml(\Dashboard\Support\formatCnpjCpf($supplier['cpf_cnpj'] ?? null)) ?></td>
+                        <td><?= \Dashboard\Support\escapeHtml($supplier['name'] ?? '-') ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

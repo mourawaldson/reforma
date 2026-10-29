@@ -17,7 +17,7 @@ $chartValues = array_values($years);
             <div class="card-body">
                 <h6>Custo Total</h6>
                 <h2 class="mb-0">
-                    R$ <?= number_format($total, 2, ',', '.') ?>
+                    <?= \Dashboard\Support\formatCurrencyBR($total) ?>
                 </h2>
             </div>
         </div>
@@ -39,9 +39,9 @@ $chartValues = array_values($years);
     <tbody>
     <?php foreach ($years as $year => $value): ?>
         <tr>
-            <td><?= htmlspecialchars($year) ?></td>
+            <td><?= \Dashboard\Support\escapeHtml($year) ?></td>
             <td class="text-end">
-                R$ <?= number_format($value, 2, ',', '.') ?>
+                <?= \Dashboard\Support\formatCurrencyBR($value) ?>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -54,8 +54,8 @@ $chartValues = array_values($years);
 <div class="card mb-4 mt-4">
     <div class="card-body">
         <canvas id="overviewChart"
-                data-chart-labels="<?= htmlspecialchars(json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
-                data-chart-values="<?= htmlspecialchars(json_encode($chartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-labels="<?= \Dashboard\Support\jsonForHtmlAttribute($chartLabels) ?>"
+                data-chart-values="<?= \Dashboard\Support\jsonForHtmlAttribute($chartValues) ?>"
                 data-chart-label="Valor Total"
                 data-chart-color="#86efac"></canvas>
     </div>

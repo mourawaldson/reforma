@@ -61,7 +61,7 @@ $chartValues = array_values($chartTotals);
         <div class="card dashboard-card dashboard-card--paid">
             <div class="card-body">
                 <h6>Total pago (confirmadas)</h6>
-                <h3>R$ <?= number_format($summary['total_paid'], 2, ',', '.') ?></h3>
+                <h3><?= \Dashboard\Support\formatCurrencyBR($summary['total_paid']) ?></h3>
             </div>
         </div>
     </div>
@@ -75,8 +75,8 @@ $chartValues = array_values($chartTotals);
 <div class="card mb-5">
     <div class="card-body">
         <canvas id="tagsChart"
-                data-chart-labels="<?= htmlspecialchars(json_encode($chartLabels, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
-                data-chart-values="<?= htmlspecialchars(json_encode($chartValues, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+                data-chart-labels="<?= \Dashboard\Support\jsonForHtmlAttribute($chartLabels) ?>"
+                data-chart-values="<?= \Dashboard\Support\jsonForHtmlAttribute($chartValues) ?>"
                 data-chart-label="Total pago"
                 data-chart-color="#86efac"></canvas>
     </div>
@@ -98,10 +98,10 @@ $chartValues = array_values($chartTotals);
     <tbody>
     <?php foreach ($consolidated as $tagName => $values): ?>
         <tr>
-            <td><?= htmlspecialchars($tagName) ?></td>
+            <td><?= \Dashboard\Support\escapeHtml($tagName) ?></td>
             <td class="text-end"><?= $values['count'] ?></td>
             <td class="text-end">
-                R$ <?= number_format($values['total_paid'], 2, ',', '.') ?>
+                <?= \Dashboard\Support\formatCurrencyBR($values['total_paid']) ?>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -113,7 +113,7 @@ $chartValues = array_values($chartTotals);
 <!-- ========================= -->
 <?php foreach ($years as $year => $yearData): ?>
     <div class="border-top pt-4 mt-4">
-        <h3 class="h6 mb-3">Ano <?= htmlspecialchars($year) ?></h3>
+        <h3 class="h6 mb-3">Ano <?= \Dashboard\Support\escapeHtml($year) ?></h3>
 
         <table class="table table-sm dashboard-table">
             <thead>
@@ -126,10 +126,10 @@ $chartValues = array_values($chartTotals);
             <tbody>
             <?php foreach ($yearData['tags'] as $tag): ?>
                 <tr>
-                    <td><?= htmlspecialchars($tag['tag']) ?></td>
+                    <td><?= \Dashboard\Support\escapeHtml($tag['tag']) ?></td>
                     <td class="text-end"><?= $tag['count'] ?></td>
                     <td class="text-end">
-                        R$ <?= number_format($tag['total_paid'], 2, ',', '.') ?>
+                        <?= \Dashboard\Support\formatCurrencyBR($tag['total_paid']) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -157,7 +157,7 @@ $chartValues = array_values($chartTotals);
             <?php if (!empty($tagsNotUsed)): ?>
                 <?php foreach ($tagsNotUsed as $tag): ?>
                     <tr>
-                        <td><?= htmlspecialchars($tag['name']) ?></td>
+                        <td><?= \Dashboard\Support\escapeHtml($tag['name']) ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
