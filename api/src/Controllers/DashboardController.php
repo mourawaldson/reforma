@@ -100,6 +100,45 @@ class DashboardController
             ];
         }
 
+        // =========================
+        // DESPESAS CONFIRMADAS COM A TAG AUMENTO DE CAPITAL
+        // =========================
+        $stmt = $pdo->prepare("
+            SELECT
+                e.date,
+                e.calendar_year,
+                e.description,
+                e.amount_paid,
+                s.name AS supplier_name
+            FROM expenses e
+            JOIN expense_tags et ON et.expense_id = e.id
+            JOIN tags t ON t.id = et.tag_id
+            LEFT JOIN suppliers s ON s.id = e.supplier_id
+            WHERE e.is_confirmed = 1
+              AND t.name = :tag_name
+            ORDER BY e.date ASC, e.id ASC
+        ");
+        $stmt->execute(['tag_name' => 'Aumento de Capital']);
+
+        $capitalIncreaseItems = [];
+        $capitalIncreaseYears = [];
+        $capitalIncreaseTotal = 0.0;
+
+        foreach ($stmt->fetchAll() as $r) {
+            $year = (int) $r['calendar_year'];
+            $amountPaid = (float) $r['amount_paid'];
+
+            $capitalIncreaseTotal += $amountPaid;
+            $capitalIncreaseYears[$year] = ($capitalIncreaseYears[$year] ?? 0.0) + $amountPaid;
+            $capitalIncreaseItems[] = [
+                'date' => $r['date'],
+                'supplier_name' => $r['supplier_name'],
+                'description' => $r['description'],
+                'amount_paid' => $amountPaid,
+            ];
+        }
+        ksort($capitalIncreaseYears, SORT_NUMERIC);
+
         header('Content-Type: application/json');
         echo json_encode([
             'years' => $years,
@@ -109,7 +148,15 @@ class DashboardController
                     'total_paid' => (float) $pendingSummary['total_paid'],
                 ],
                 'years' => $pendingYears
-            ]
+            ],
+            'capital_increase' => [
+                'summary' => [
+                    'count' => count($capitalIncreaseItems),
+                    'total_paid' => $capitalIncreaseTotal,
+                ],
+                'years' => $capitalIncreaseYears,
+                'items' => $capitalIncreaseItems,
+            ],
         ]);
     }
 

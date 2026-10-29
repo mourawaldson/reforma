@@ -9,6 +9,12 @@ $pending = $data['pending'] ?? [
         'years' => [],
 ];
 
+$capitalIncrease = $data['capital_increase'] ?? [
+        'summary' => ['count' => 0, 'total_paid' => 0],
+        'years' => [],
+        'items' => [],
+];
+
 $discounts = $data['discounts'] ?? [
         'items' => [],
         'totals' => [
@@ -41,14 +47,35 @@ foreach ($years as $year => $yearData) {
 }
 
 $overallDiff = $overallNf - $overallPaid;
+
+$capitalIncreaseYears = $capitalIncrease['years'] ?? [];
+$capitalIncreaseItems = $capitalIncrease['items'] ?? [];
+$capitalIncreaseChartLabels = array_map('strval', array_keys($capitalIncreaseYears));
+$capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreaseYears));
 ?>
 
 <style>
+    .dashboard-expenses {
+        font-size: .9rem;
+    }
+
+    .dashboard-expenses h1.h3 { font-size: 1.5rem; }
+    .dashboard-expenses h2.h5 { font-size: 1.05rem; }
+    .dashboard-expenses h3.h5 { font-size: 1rem; }
+    .dashboard-expenses h3.h6 { font-size: .9rem; }
+
+    .dashboard-expenses .card h3 {
+        font-size: 1.35rem;
+        margin-bottom: 0;
+    }
+
+    .dashboard-expenses .card h6 {
+        font-size: .85rem;
+    }
+
     .table-discounts th {
         white-space: nowrap;
         font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: .03em;
     }
 
     .table-discounts td {
@@ -63,8 +90,81 @@ $overallDiff = $overallNf - $overallPaid;
     }
 
     .table-discounts tfoot th {
-        background-color: #f8fafc;
         font-weight: 600;
+    }
+
+    .expenses-table-shell {
+        border: 1px solid #dee2e6;
+        border-radius: .5rem;
+        background-color: #f8f9fa;
+        overflow-x: auto;
+        overflow-y: hidden;
+        font-size: .8rem;
+    }
+
+    .expenses-table-shell .table {
+        --bs-table-bg: transparent;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 0;
+    }
+
+    .expenses-table-shell .table > :not(caption) > * > * {
+        padding: .35rem .5rem;
+    }
+
+    .expenses-table-shell thead {
+        --bs-table-bg: #fff;
+        --bs-table-color: #6c757d;
+    }
+
+    .expenses-table-shell thead th {
+        font-size: .75rem;
+        font-weight: 600;
+    }
+
+    .expenses-table-shell tbody td {
+        background-color: #fff;
+    }
+
+    .expenses-table-shell thead th:first-child { border-top-left-radius: .45rem; }
+    .expenses-table-shell thead th:last-child { border-top-right-radius: .45rem; }
+
+    .expenses-table-shell tfoot tr {
+        --bs-table-bg: #eaf2ff;
+        --bs-table-striped-bg: #eaf2ff;
+        --bs-table-color: #212529;
+    }
+
+    .expenses-table-shell tfoot th:first-child { border-bottom-left-radius: .45rem; }
+    .expenses-table-shell tfoot th:last-child { border-bottom-right-radius: .45rem; }
+
+    .table-capital-increase .col-description {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .table-capital-increase .col-supplier {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .table-capital-increase {
+        width: 100%;
+        min-width: 760px;
+        table-layout: fixed;
+    }
+
+    .table-capital-increase .col-date {
+        width: 11%;
+        white-space: nowrap;
+    }
+    .table-capital-increase .col-supplier { width: 23%; }
+    .table-capital-increase .col-description { width: 48%; }
+
+    .table-capital-increase .col-paid {
+        width: 18%;
+        white-space: nowrap;
     }
 
     .vet-value {
@@ -73,6 +173,7 @@ $overallDiff = $overallNf - $overallPaid;
     }
 </style>
 
+<div class="dashboard-expenses">
 <h1 class="h3 mb-4">Dashboard de Despesas</h1>
 
 <!-- ================================================= -->
@@ -211,17 +312,107 @@ $overallDiff = $overallNf - $overallPaid;
 <?php endforeach; ?>
 
 <!-- ================================================= -->
+<!-- GASTOS COM A TAG AUMENTO DE CAPITAL -->
+<!-- ================================================= -->
+<section class="border-top pt-4 mt-5">
+    <h2 class="h5 mb-3">Gastos com a tag Aumento de Capital</h2>
+    <p class="text-muted">Somente despesas confirmadas.</p>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card" style="background-color:#dcfce7;border:none;">
+                <div class="card-body">
+                    <h6>Total pago</h6>
+                    <h3>R$ <?php echo number_format((float)($capitalIncrease['summary']['total_paid'] ?? 0), 2, ',', '.'); ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="background-color:#f3f4f6;border:none;">
+                <div class="card-body">
+                    <h6>Despesas confirmadas</h6>
+                    <h3><?php echo (int)($capitalIncrease['summary']['count'] ?? 0); ?></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php if (!empty($capitalIncreaseYears)): ?>
+        <div class="row mb-4">
+            <?php foreach ($capitalIncreaseYears as $year => $totalPaid): ?>
+                <div class="col-sm-6 col-lg-4 mb-3">
+                    <div class="card h-100" style="background-color:#dcfce7;border:none;">
+                        <div class="card-body">
+                            <h6>Ano <?php echo htmlspecialchars((string)$year); ?></h6>
+                            <h3>R$ <?php echo number_format((float)$totalPaid, 2, ',', '.'); ?></h3>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <h3 class="h6 mb-3">Total pago por ano</h3>
+    <?php if (!empty($capitalIncreaseYears)): ?>
+        <div class="card mb-4">
+            <div class="card-body">
+                <canvas id="capitalIncreaseChart"></canvas>
+            </div>
+        </div>
+    <?php else: ?>
+        <p class="text-muted">Não há despesas confirmadas com essa tag.</p>
+    <?php endif; ?>
+
+    <?php if (!empty($capitalIncreaseItems)): ?>
+        <div class="table-responsive expenses-table-shell mb-5">
+            <table class="table table-sm table-capital-increase">
+                <colgroup>
+                    <col class="col-date">
+                    <col class="col-supplier">
+                    <col class="col-description">
+                    <col class="col-paid">
+                </colgroup>
+                <thead class="table-light">
+                <tr>
+                    <th class="col-date">Data</th>
+                    <th class="col-supplier text-start">Fornecedor</th>
+                    <th class="col-description">Descrição</th>
+                    <th class="text-end col-paid">Pago</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($capitalIncreaseItems as $item): ?>
+                    <tr>
+                        <td><?php echo !empty($item['date']) ? date('d/m/Y', strtotime($item['date'])) : '-'; ?></td>
+                        <td class="col-supplier text-start"><?php echo htmlspecialchars($item['supplier_name'] ?? '-') ?: '-'; ?></td>
+                        <td class="col-description"><?php echo htmlspecialchars($item['description'] ?? '-') ?: '-'; ?></td>
+                        <td class="text-end col-paid">R$ <?php echo number_format((float)($item['amount_paid'] ?? 0), 2, ',', '.'); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th colspan="3">Total pago</th>
+                    <th class="text-end col-paid">R$ <?php echo number_format((float)($capitalIncrease['summary']['total_paid'] ?? 0), 2, ',', '.'); ?></th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    <?php endif; ?>
+</section>
+
+<!-- ================================================= -->
 <!-- 3. DESCONTOS -->
 <!-- ================================================= -->
 <h2 class="h5 mt-5 mb-3">Descontos</h2>
 
 <?php if (!empty($discounts['items'])): ?>
-    <div class="table-responsive">
-        <table class="table table-sm table-striped table-hover table-discounts">
+    <div class="table-responsive expenses-table-shell">
+        <table class="table table-sm table-discounts">
             <thead class="table-light">
             <tr>
                 <th>Data</th>
-                <th>Fornecedor</th>
+                <th class="text-start">Fornecedor</th>
                 <th>Descrição</th>
                 <th class="text-end">Pago</th>
                 <th class="text-end">Desconto</th>
@@ -232,7 +423,7 @@ $overallDiff = $overallNf - $overallPaid;
             <?php foreach ($discounts['items'] as $row): ?>
                 <tr>
                     <td><?php echo !empty($row['date']) ? date('d/m/Y', strtotime($row['date'])) : '-'; ?></td>
-                    <td><?php echo htmlspecialchars($row['supplier_name'] ?? '-') ?: '-'; ?></td>
+                    <td class="text-start"><?php echo htmlspecialchars($row['supplier_name'] ?? '-') ?: '-'; ?></td>
                     <td class="col-description"
                         title="<?php echo htmlspecialchars($row['description'] ?? '-'); ?>">
                         <?php echo htmlspecialchars($row['description'] ?? '-') ?: '-'; ?>
@@ -271,6 +462,25 @@ $overallDiff = $overallNf - $overallPaid;
 
 <script>
     (function () {
+        const capitalIncreaseCtx = document.getElementById('capitalIncreaseChart');
+        if (capitalIncreaseCtx) {
+            new Chart(capitalIncreaseCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?php echo json_encode($capitalIncreaseChartLabels); ?>,
+                    datasets: [{
+                        label: 'Total pago',
+                        data: <?php echo json_encode($capitalIncreaseChartValues); ?>,
+                        backgroundColor: '#86efac'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
         const ctx = document.getElementById('confirmedYearChart');
         if (!ctx) return;
 
@@ -293,3 +503,4 @@ $overallDiff = $overallNf - $overallPaid;
         });
     })();
 </script>
+</div>
