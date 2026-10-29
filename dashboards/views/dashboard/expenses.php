@@ -130,12 +130,6 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     .expenses-table-shell thead th:first-child { border-top-left-radius: .45rem; }
     .expenses-table-shell thead th:last-child { border-top-right-radius: .45rem; }
 
-    .expenses-table-shell tfoot tr {
-        --bs-table-bg: #eaf2ff;
-        --bs-table-striped-bg: #eaf2ff;
-        --bs-table-color: #212529;
-    }
-
     .expenses-table-shell tfoot th:first-child { border-bottom-left-radius: .45rem; }
     .expenses-table-shell tfoot th:last-child { border-bottom-right-radius: .45rem; }
 

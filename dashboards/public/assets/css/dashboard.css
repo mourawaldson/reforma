@@ -49,11 +49,5 @@
 .dashboard-table tbody tr:last-child td:first-child { border-bottom-left-radius: .45rem; }
 .dashboard-table tbody tr:last-child td:last-child { border-bottom-right-radius: .45rem; }
 
-.dashboard-table tfoot tr {
-    --bs-table-bg: #eaf2ff;
-    --bs-table-striped-bg: #eaf2ff;
-    --bs-table-color: #212529;
-}
-
 .dashboard-table tfoot th:first-child { border-bottom-left-radius: .45rem; }
 .dashboard-table tfoot th:last-child { border-bottom-right-radius: .45rem; }

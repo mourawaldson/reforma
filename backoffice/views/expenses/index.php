@@ -1,6 +1,6 @@
 <style>
     .descricao-coluna {
-        max-width: 260px;
+        max-width: 360px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -200,19 +200,21 @@
                 /* ===== Confirmadas por ano ===== */
                 const yearKeys = Object.keys(yearsMap).sort();
 
+                if (yearKeys.length > 0) {
+                    html += '<h2 class="h5 mt-5 mb-3">Despesas confirmadas</h2>';
+                }
+
                 yearKeys.forEach(function(year) {
                     const confirmed = yearsMap[year];
 
                     html += '<div class="mb-4">';
-                    html += '<h2 class="h5 mb-3">Ano ' + year + '</h2>';
-
                     let totalPaid = 0;
                     let totalNf   = 0;
                     const tableId = 'expenses-table-' + year;
 
                     html += '<div class="card">';
                     html += '<div class="card-body">';
-                    html += '<h3 class="h6 mb-3">Despesas confirmadas</h3>';
+                    html += '<h2 class="h6 mb-3">Ano ' + year + '</h2>';
                     html += '<div class="table-responsive">';
                     html += '<table id="' + tableId + '" class="table table-sm table-striped align-middle">';
                     html += '<thead><tr>';
