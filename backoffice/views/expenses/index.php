@@ -64,6 +64,22 @@
             return html;
         }
 
+        function hasNfValue(expense) {
+            const value = expense.amount_nf;
+            if (value === null || value === undefined ||
+                (typeof value === 'string' && value.trim() === '')) {
+                return false;
+            }
+
+            return Number(value) !== 0;
+        }
+
+        function isConfirmed(expense) {
+            return expense.is_confirmed === 1 ||
+                expense.is_confirmed === '1' ||
+                expense.is_confirmed === true;
+        }
+
         function loadExpenses() {
             $.getJSON(API_BASE + '/expenses', function(data) {
                 if (!Array.isArray(data) || data.length === 0) {
@@ -74,15 +90,13 @@
                 }
 
                 const pendingList = [];
+                const missingNfList = data.filter(function(e) {
+                    return isConfirmed(e) && !hasNfValue(e);
+                });
                 const yearsMap = {};
 
                 data.forEach(function(e) {
-                    const isConfirmed =
-                        e.is_confirmed === 1 ||
-                        e.is_confirmed === '1' ||
-                        e.is_confirmed === true;
-
-                    if (!isConfirmed) {
+                    if (!isConfirmed(e)) {
                         pendingList.push(e);
                         return;
                     }
@@ -100,7 +114,37 @@
 
                 let html = '';
 
-                /* ===== Pendentes (TOPO) ===== */
+                /* ===== Despesas sem valor de NF ===== */
+                if (missingNfList.length > 0) {
+                    html += '<div class="card border-warning mb-4">';
+                    html += '<div class="card-header bg-warning-subtle"><strong>Despesas sem valor de NF</strong></div>';
+                    html += '<div class="table-responsive">';
+                    html += '<table class="table table-sm table-striped align-middle mb-0">';
+                    html += '<thead><tr>';
+                    html += '<th>Data</th>';
+                    html += '<th>Fornecedor</th>';
+                    html += '<th>Descrição</th>';
+                    html += '<th class="text-end">Pago</th>';
+                    html += '<th class="text-center">Ações</th>';
+                    html += '</tr></thead><tbody>';
+
+                    missingNfList.forEach(function(e) {
+                        html += '<tr>';
+                        html += '<td>' + formatDateBR(e.date) + '</td>';
+                        html += '<td>' + (e.supplier_name || '-') + '</td>';
+                        html += '<td>' + renderDescriptionWithTags(e) + '</td>';
+                        html += '<td class="text-end">' + formatCurrencyBRFromNumber(e.amount_paid) + '</td>';
+                        html += '<td class="text-center">';
+                        html += '<a href="/expenses/' + e.id + '/edit" class="btn btn-sm btn-outline-secondary me-1">Editar</a>';
+                        html += '<button type="button" class="btn btn-sm btn-outline-danger btn-delete-expense" data-id="' + e.id + '">Remover</button>';
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table></div></div>';
+                }
+
+                /* ===== Pendentes ===== */
                 if (pendingList.length > 0) {
                     let totalPendingNf = 0;
                     let totalPendingPaid = 0;
