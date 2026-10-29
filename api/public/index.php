@@ -4,10 +4,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
-// CORS
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+header('X-Content-Type-Options: nosniff');
+header('Cache-Control: no-store, private');
+
+$config = require __DIR__ . '/../config/config.php';
+$allowedOrigins = $config['cors_allowed_origins'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$originAllowed = $origin !== '' && in_array($origin, $allowedOrigins, true);
+
+if ($originAllowed) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+} elseif ($origin !== '' && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(403);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);

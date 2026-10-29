@@ -109,4 +109,4 @@
     <span class="badge bg-secondary me-1"></span>
 </template>
 
-<script src="/assets/js/expenses.js"></script>
+<script src="/assets/js/expenses.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/expenses.js'); ?>"></script>

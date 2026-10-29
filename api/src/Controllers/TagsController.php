@@ -6,13 +6,6 @@ require_once __DIR__ . '/../Validator.php';
 
 class TagsController
 {
-    private function getJsonInput(): array
-    {
-        $raw = file_get_contents('php://input');
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
-    }
-
     public function index()
     {
         $data = Tag::all();
@@ -36,19 +29,20 @@ class TagsController
 
     public function store()
     {
-        $data = $this->getJsonInput();
+        $data = Validator::jsonInput();
 
         Validator::validate($data, function (Validator $v) {
-            $v->required(['name']);
+            $v->required(['name'])->string(['name'], 100);
         });
 
-        if (Tag::findByName($data['name'])) {
+        $name = trim($data['name']);
+        if (Tag::findByName($name)) {
             http_response_code(409);
             echo json_encode(['error' => 'Já existe uma tag com esse nome']);
             return;
         }
 
-        $id = Tag::create(['name' => $data['name']]);
+        $id = Tag::create(['name' => $name]);
 
         header('Content-Type: application/json');
         http_response_code(201);
@@ -69,20 +63,21 @@ class TagsController
             return;
         }
 
-        $data = $this->getJsonInput();
+        $data = Validator::jsonInput();
 
         Validator::validate($data, function (Validator $v) {
-            $v->required(['name']);
+            $v->required(['name'])->string(['name'], 100);
         });
 
-        $byName = Tag::findByName($data['name']);
+        $name = trim($data['name']);
+        $byName = Tag::findByName($name);
         if ($byName && (int) $byName['id'] !== $id) {
             http_response_code(409);
             echo json_encode(['error' => 'Já existe uma tag com esse nome']);
             return;
         }
 
-        Tag::update($id, ['name' => $data['name']]);
+        Tag::update($id, ['name' => $name]);
 
         header('Content-Type: application/json');
         echo json_encode(['message' => 'Tag atualizada com sucesso']);

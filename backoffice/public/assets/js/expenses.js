@@ -13,6 +13,32 @@ $(function () {
         tag: document.getElementById('expense-tag-template')
     };
 
+    $.extend(true, $.fn.dataTable.defaults, {
+        language: {
+            decimal: ',',
+            thousands: '.',
+            processing: 'Processando...',
+            search: 'Buscar:',
+            lengthMenu: 'Mostrar _MENU_ registros',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+            infoFiltered: '(filtrado de _MAX_ registros no total)',
+            loadingRecords: 'Carregando...',
+            zeroRecords: 'Nenhum registro encontrado',
+            emptyTable: 'Nenhum dado disponível na tabela',
+            paginate: {
+                first: 'Primeiro',
+                previous: 'Anterior',
+                next: 'Próximo',
+                last: 'Último'
+            },
+            aria: {
+                sortAscending: ': ativar para ordenar a coluna em ordem crescente',
+                sortDescending: ': ativar para ordenar a coluna em ordem decrescente'
+            }
+        }
+    });
+
     $.extend($.fn.dataTable.ext.type.order, {
         'date-eu-pre': function (date) {
             if (!date) return 0;
@@ -240,29 +266,6 @@ $(function () {
                 $(table).DataTable({
                     order: [],
                     pageLength: 10,
-                    language: {
-                        decimal: ',',
-                        thousands: '.',
-                        processing: 'Processando...',
-                        search: 'Buscar:',
-                        lengthMenu: 'Mostrar _MENU_ registros',
-                        info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-                        infoEmpty: 'Mostrando 0 a 0 de 0 registros',
-                        infoFiltered: '(filtrado de _MAX_ registros no total)',
-                        loadingRecords: 'Carregando...',
-                        zeroRecords: 'Nenhum registro encontrado',
-                        emptyTable: 'Nenhum dado disponível na tabela',
-                        paginate: {
-                            first: 'Primeiro',
-                            previous: 'Anterior',
-                            next: 'Próximo',
-                            last: 'Último'
-                        },
-                        aria: {
-                            sortAscending: ': ativar para ordenar a coluna em ordem crescente',
-                            sortDescending: ': ativar para ordenar a coluna em ordem decrescente'
-                        }
-                    },
                     columnDefs: [
                         { targets: 0, type: 'date-eu' },
                         { targets: [3, 4], className: 'text-end' }

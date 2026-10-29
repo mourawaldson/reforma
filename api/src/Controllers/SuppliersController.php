@@ -6,13 +6,6 @@ require_once __DIR__ . '/../Validator.php';
 
 class SuppliersController
 {
-    private function getJsonInput(): array
-    {
-        $raw = file_get_contents('php://input');
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
-    }
-
     private function normalizeCpfCnpj(?string $value): ?string
     {
         if (!$value)
@@ -42,13 +35,21 @@ class SuppliersController
 
     public function store()
     {
-        $data = $this->getJsonInput();
+        $data = Validator::jsonInput();
 
         Validator::validate($data, function (Validator $v) {
-            $v->required(['name']);
+            $v->required(['name'])
+                ->string(['name', 'company_name'], 255)
+                ->string(['cpf_cnpj'], 20);
         });
 
-        $cpfCnpj = $this->normalizeCpfCnpj($data['cpf_cnpj'] ?? null);
+        $cpfCnpj = $this->normalizeCpfCnpj(isset($data['cpf_cnpj']) ? trim($data['cpf_cnpj']) : null);
+        if ($cpfCnpj !== null && !in_array(strlen($cpfCnpj), [11, 14], true)) {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'CPF/CNPJ deve conter 11 ou 14 dígitos']);
+            return;
+        }
 
         if ($cpfCnpj) {
             $existing = Supplier::findByCpfCnpj($cpfCnpj);
@@ -67,8 +68,8 @@ class SuppliersController
         }
 
         $id = Supplier::create([
-            'name' => $data['name'],
-            'company_name' => $data['company_name'] ?? null,
+            'name' => trim($data['name']),
+            'company_name' => isset($data['company_name']) ? trim($data['company_name']) : null,
             'cpf_cnpj' => $cpfCnpj,
         ]);
 
@@ -87,13 +88,21 @@ class SuppliersController
             return;
         }
 
-        $data = $this->getJsonInput();
+        $data = Validator::jsonInput();
 
         Validator::validate($data, function (Validator $v) {
-            $v->required(['name']);
+            $v->required(['name'])
+                ->string(['name', 'company_name'], 255)
+                ->string(['cpf_cnpj'], 20);
         });
 
-        $cpfCnpj = $this->normalizeCpfCnpj($data['cpf_cnpj'] ?? null);
+        $cpfCnpj = $this->normalizeCpfCnpj(isset($data['cpf_cnpj']) ? trim($data['cpf_cnpj']) : null);
+        if ($cpfCnpj !== null && !in_array(strlen($cpfCnpj), [11, 14], true)) {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'CPF/CNPJ deve conter 11 ou 14 dígitos']);
+            return;
+        }
 
         if ($cpfCnpj) {
             $existing = Supplier::findByCpfCnpj($cpfCnpj);
@@ -113,8 +122,8 @@ class SuppliersController
         }
 
         Supplier::update($id, [
-            'name' => $data['name'],
-            'company_name' => $data['company_name'] ?? null,
+            'name' => trim($data['name']),
+            'company_name' => isset($data['company_name']) ? trim($data['company_name']) : null,
             'cpf_cnpj' => $cpfCnpj,
         ]);
 

@@ -1,4 +1,9 @@
 <?php
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');

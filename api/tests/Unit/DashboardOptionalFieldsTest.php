@@ -44,9 +44,8 @@ class DashboardOptionalFieldsTest extends TestCase
         ob_start();
         require __DIR__ . '/../../../dashboards/views/dashboard/expenses.php';
         $html = ob_get_clean();
-
         $this->assertStringContainsString('<td>-</td>', $html);
-        $this->assertStringContainsString('<td class="text-end">-</td>', $html);
-        $this->assertStringContainsString('<td class="text-end">R$ 0,00</td>', $html);
+        $this->assertMatchesRegularExpression('/<td class="text-end">\s*-\s*<\/td>/', $html);
+        $this->assertMatchesRegularExpression('/<td class="text-end">\s*R\$ 0,00\s*<\/td>/', $html);
     }
 }

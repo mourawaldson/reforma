@@ -8,7 +8,7 @@ services:
       MYSQL_USER: reforma
       MYSQL_PASSWORD: reforma
     ports:
-      - "3306:3306"
+      - "${HOST_BIND_ADDRESS:-127.0.0.1}:3306:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d:ro
@@ -21,7 +21,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8000:80"
+      - "${HOST_BIND_ADDRESS:-127.0.0.1}:8000:80"
     volumes:
       - ./api:/var/www/html
 
@@ -33,7 +33,7 @@ services:
     depends_on:
       - api
     ports:
-      - "8001:80"
+      - "${HOST_BIND_ADDRESS:-127.0.0.1}:8001:80"
     volumes:
       - ./backoffice:/var/www/html
 
@@ -45,7 +45,7 @@ services:
     depends_on:
       - api
     ports:
-      - "8002:80"
+      - "${HOST_BIND_ADDRESS:-127.0.0.1}:8002:80"
     volumes:
       - ./dashboards:/var/www/html
 
@@ -60,7 +60,7 @@ services:
       PMA_PASSWORD: reforma
       UPLOAD_LIMIT: 512M
     ports:
-      - "8080:80"
+      - "${HOST_BIND_ADDRESS:-127.0.0.1}:8080:80"
 
 volumes:
   db_data:

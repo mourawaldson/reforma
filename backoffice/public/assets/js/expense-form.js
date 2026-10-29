@@ -33,16 +33,20 @@ $(function() {
                         label += ' — ' + formatCpfCnpj(s.cpf_cnpj);
                     }
 
-                    $sel.append(
-                        '<option value="' + s.id + '">' + label + '</option>'
-                    );
+                    const option = document.createElement('option');
+                    option.value = String(s.id);
+                    option.textContent = label;
+                    $sel.append(option);
                 });
             });
 
             const tagsRequest = $.getJSON(API_BASE + '/tags').done(function(tags) {
                 const $tagSelect = $('#tags_select');
                 tags.forEach(function(t) {
-                    $tagSelect.append('<option value="' + t.id + '">' + t.name + '</option>');
+                    const option = document.createElement('option');
+                    option.value = String(t.id);
+                    option.textContent = t.name;
+                    $tagSelect.append(option);
                 });
             });
 

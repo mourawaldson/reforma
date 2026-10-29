@@ -22,7 +22,7 @@ class Supplier
     public static function find(int $id): ?array
     {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM suppliers WHERE id = :id");
+        $stmt = $pdo->prepare("SELECT suppliers.*, suppliers.name AS display_name FROM suppliers WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch() ?: null;
     }
@@ -81,17 +81,40 @@ class Supplier
     public static function delete(int $id): bool
     {
         $pdo = Database::getConnection();
-        $pdo->beginTransaction();
+        $ownsTransaction = !$pdo->inTransaction();
+        $savepoint = 'supplier_delete';
 
-        $pdo->prepare(
-            "UPDATE expenses SET supplier_id = NULL WHERE supplier_id = :id"
-        )->execute(['id' => $id]);
+        if ($ownsTransaction) {
+            $pdo->beginTransaction();
+        } else {
+            $pdo->exec("SAVEPOINT {$savepoint}");
+        }
 
-        $ok = $pdo->prepare(
-            "DELETE FROM suppliers WHERE id = :id"
-        )->execute(['id' => $id]);
+        try {
+            $pdo->prepare(
+                "UPDATE expenses SET supplier_id = NULL WHERE supplier_id = :id"
+            )->execute(['id' => $id]);
 
-        $pdo->commit();
-        return $ok;
+            $ok = $pdo->prepare(
+                "DELETE FROM suppliers WHERE id = :id"
+            )->execute(['id' => $id]);
+
+            if ($ownsTransaction) {
+                $pdo->commit();
+            } else {
+                $pdo->exec("RELEASE SAVEPOINT {$savepoint}");
+            }
+
+            return $ok;
+        } catch (Throwable $exception) {
+            if ($ownsTransaction && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            } elseif (!$ownsTransaction) {
+                $pdo->exec("ROLLBACK TO SAVEPOINT {$savepoint}");
+                $pdo->exec("RELEASE SAVEPOINT {$savepoint}");
+            }
+
+            throw $exception;
+        }
     }
 }

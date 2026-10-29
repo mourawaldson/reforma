@@ -5,13 +5,6 @@ require_once __DIR__ . '/../Validator.php';
 
 class ExpensesController
 {
-    private function getJsonInput(): array
-    {
-        $raw = file_get_contents('php://input');
-        $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
-    }
-
     public function index()
     {
         $filters = [
@@ -46,19 +39,22 @@ class ExpensesController
 
     public function store()
     {
-        $data = $this->getJsonInput();
+        $data = Validator::jsonInput();
 
         Validator::validate($data, function (Validator $v) {
             $v->required(['date', 'description', 'amount_paid'])
-                ->numeric(['amount_paid'])
-                ->date(['date']);
+                ->string(['date', 'description'], 255)
+                ->numeric(['amount_paid'], 99999999.99)
+                ->date(['date'])
+                ->positiveInteger(['supplier_id'])
+                ->positiveIntegerArray('tags');
 
             // Optional numeric fields
             $d = $v->getData();
             if (isset($d['amount_nf']))
-                $v->numeric(['amount_nf']);
+                $v->numeric(['amount_nf'], 99999999.99);
             if (isset($d['additional_discount']))
-                $v->numeric(['additional_discount']);
+                $v->numeric(['additional_discount'], 99999999.99);
         });
 
         // Extrai ano da data (YYYY-MM-DD)
@@ -69,7 +65,7 @@ class ExpensesController
         $isConfirmed = ($data['date'] > $today) ? 0 : 1;
 
         $tags = isset($data['tags']) && is_array($data['tags'])
-            ? $data['tags']
+            ? array_map('intval', $data['tags'])
             : [];
 
         $payload = [
@@ -103,19 +99,22 @@ class ExpensesController
             return;
         }
 
-        $data = $this->getJsonInput();
+        $data = Validator::jsonInput();
 
         Validator::validate($data, function (Validator $v) {
             $v->required(['date', 'description', 'amount_paid'])
-                ->numeric(['amount_paid'])
-                ->date(['date']);
+                ->string(['date', 'description'], 255)
+                ->numeric(['amount_paid'], 99999999.99)
+                ->date(['date'])
+                ->positiveInteger(['supplier_id'])
+                ->positiveIntegerArray('tags');
 
             // Optional numeric fields
             $d = $v->getData();
             if (isset($d['amount_nf']))
-                $v->numeric(['amount_nf']);
+                $v->numeric(['amount_nf'], 99999999.99);
             if (isset($d['additional_discount']))
-                $v->numeric(['additional_discount']);
+                $v->numeric(['additional_discount'], 99999999.99);
         });
 
         $calendarYear = (int) substr($data['date'], 0, 4);
@@ -130,7 +129,7 @@ class ExpensesController
             'calendar_year' => $calendarYear,
         ];
 
-        Expense::update($id, $payload, $data['tags'] ?? []);
+        Expense::update($id, $payload, array_map('intval', $data['tags'] ?? []));
 
         header('Content-Type: application/json');
         echo json_encode(['message' => 'Despesa atualizada']);
