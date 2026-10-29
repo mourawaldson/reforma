@@ -13,7 +13,7 @@ $chartValues = array_values($years);
 <!-- ========================= -->
 <div class="row mb-4">
     <div class="col-md-6">
-        <div class="card" style="background:#dcfce7;border:none;">
+        <div class="card dashboard-card dashboard-card--paid">
             <div class="card-body">
                 <h6>Custo Total</h6>
                 <h2 class="mb-0">
@@ -29,7 +29,7 @@ $chartValues = array_values($years);
 <!-- ========================= -->
 <h2 class="h5 mb-3">Total por Ano</h2>
 
-<table class="table table-sm dashboard-table" style="max-width:420px;">
+<table class="table table-sm dashboard-table dashboard-table--narrow">
     <thead>
     <tr>
         <th>Ano</th>

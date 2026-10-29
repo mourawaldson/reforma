@@ -1,12 +1,3 @@
-<style>
-    .descricao-coluna {
-        max-width: 360px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
-
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3">Despesas</h1>
     <a href="/expenses/create" class="btn btn-primary">+ Nova despesa</a>

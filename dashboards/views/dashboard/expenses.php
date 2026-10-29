@@ -54,119 +54,6 @@ $capitalIncreaseChartLabels = array_map('strval', array_keys($capitalIncreaseYea
 $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreaseYears));
 ?>
 
-<style>
-    .dashboard-expenses {
-        font-size: .9rem;
-    }
-
-    .dashboard-expenses h1.h3 { font-size: 1.5rem; }
-    .dashboard-expenses h2.h5 { font-size: 1.05rem; }
-    .dashboard-expenses h3.h5 { font-size: 1rem; }
-    .dashboard-expenses h3.h6 { font-size: .9rem; }
-
-    .dashboard-expenses .card h3 {
-        font-size: 1.35rem;
-        margin-bottom: 0;
-    }
-
-    .dashboard-expenses .card h6 {
-        font-size: .85rem;
-    }
-
-    .table-discounts th {
-        white-space: nowrap;
-        font-size: 0.85rem;
-    }
-
-    .table-discounts td {
-        vertical-align: middle;
-    }
-
-    .table-discounts .col-description {
-        max-width: 420px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .table-discounts tfoot th {
-        font-weight: 600;
-    }
-
-    .expenses-table-shell {
-        border: 1px solid #dee2e6;
-        border-radius: .5rem;
-        background-color: #f8f9fa;
-        overflow-x: auto;
-        overflow-y: hidden;
-        font-size: .8rem;
-    }
-
-    .expenses-table-shell .table {
-        --bs-table-bg: transparent;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-bottom: 0;
-    }
-
-    .expenses-table-shell .table > :not(caption) > * > * {
-        padding: .35rem .5rem;
-    }
-
-    .expenses-table-shell thead {
-        --bs-table-bg: #fff;
-        --bs-table-color: #6c757d;
-    }
-
-    .expenses-table-shell thead th {
-        font-size: .75rem;
-        font-weight: 600;
-    }
-
-    .expenses-table-shell tbody td {
-        background-color: #fff;
-    }
-
-    .expenses-table-shell thead th:first-child { border-top-left-radius: .45rem; }
-    .expenses-table-shell thead th:last-child { border-top-right-radius: .45rem; }
-
-    .expenses-table-shell tfoot th:first-child { border-bottom-left-radius: .45rem; }
-    .expenses-table-shell tfoot th:last-child { border-bottom-right-radius: .45rem; }
-
-    .table-capital-increase .col-description {
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-
-    .table-capital-increase .col-supplier {
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-
-    .table-capital-increase {
-        width: 100%;
-        min-width: 760px;
-        table-layout: fixed;
-    }
-
-    .table-capital-increase .col-date {
-        width: 11%;
-        white-space: nowrap;
-    }
-    .table-capital-increase .col-supplier { width: 23%; }
-    .table-capital-increase .col-description { width: 48%; }
-
-    .table-capital-increase .col-paid {
-        width: 18%;
-        white-space: nowrap;
-    }
-
-    .vet-value {
-        font-weight: 600;
-        color: #0f172a;
-    }
-</style>
-
 <div class="dashboard-expenses">
 <h1 class="h3 mb-4">Dashboard de Despesas</h1>
 
@@ -177,7 +64,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
 <div class="row mb-4">
     <div class="col-md-6">
-        <div class="card" style="background-color:#fee2e2;border:none;">
+        <div class="card dashboard-card dashboard-card--pending">
             <div class="card-body">
                 <h6>Quantidade</h6>
                 <h3><?php echo (int)$pending['summary']['count']; ?></h3>
@@ -186,7 +73,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     </div>
 
     <div class="col-md-6">
-        <div class="card" style="background-color:#f3f4f6;border:none;">
+        <div class="card dashboard-card dashboard-card--neutral">
             <div class="card-body">
                 <h6>Total</h6>
                 <h3>R$ <?php echo number_format($pending['summary']['total_paid'], 2, ',', '.'); ?></h3>
@@ -201,7 +88,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
         <div class="row mb-4">
             <div class="col-md-6">
-                <div class="card" style="background-color:#fee2e2;border:none;">
+                <div class="card dashboard-card dashboard-card--pending">
                     <div class="card-body">
                         <h6>Quantidade</h6>
                         <h3><?php echo (int)$p['count']; ?></h3>
@@ -210,7 +97,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             </div>
 
             <div class="col-md-6">
-                <div class="card" style="background-color:#f3f4f6;border:none;">
+                <div class="card dashboard-card dashboard-card--neutral">
                     <div class="card-body">
                         <h6>Total</h6>
                         <h3>R$ <?php echo number_format($p['total_paid'], 2, ',', '.'); ?></h3>
@@ -228,7 +115,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="card" style="background-color:#dbeafe;border:none;">
+        <div class="card dashboard-card dashboard-card--invoice">
             <div class="card-body">
                 <h6>Total NF (Geral)</h6>
                 <h3>R$ <?php echo number_format($overallNf, 2, ',', '.'); ?></h3>
@@ -237,7 +124,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     </div>
 
     <div class="col-md-4">
-        <div class="card" style="background-color:#dcfce7;border:none;">
+        <div class="card dashboard-card dashboard-card--paid">
             <div class="card-body">
                 <h6>Total Pago (Geral)</h6>
                 <h3>R$ <?php echo number_format($overallPaid, 2, ',', '.'); ?></h3>
@@ -246,7 +133,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
     </div>
 
     <div class="col-md-4">
-        <div class="card" style="background-color:#ede9fe;border:none;">
+        <div class="card dashboard-card dashboard-card--difference">
             <div class="card-body">
                 <h6>Diferença (NF - Pago)</h6>
                 <h3>R$ <?php echo number_format($overallDiff, 2, ',', '.'); ?></h3>
@@ -276,7 +163,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
         <div class="row mb-4">
             <div class="col-md-4">
-                <div class="card" style="background-color:#dbeafe;border:none;">
+                <div class="card dashboard-card dashboard-card--invoice">
                     <div class="card-body">
                         <h6>Total NF</h6>
                         <h3>R$ <?php echo number_format($summary['total_nf'], 2, ',', '.'); ?></h3>
@@ -285,7 +172,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             </div>
 
             <div class="col-md-4">
-                <div class="card" style="background-color:#dcfce7;border:none;">
+                <div class="card dashboard-card dashboard-card--paid">
                     <div class="card-body">
                         <h6>Total Pago</h6>
                         <h3>R$ <?php echo number_format($summary['total_paid'], 2, ',', '.'); ?></h3>
@@ -294,7 +181,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             </div>
 
             <div class="col-md-4">
-                <div class="card" style="background-color:#fef9c3;border:none;">
+                <div class="card dashboard-card dashboard-card--attention">
                     <div class="card-body">
                         <h6>Diferença</h6>
                         <h3>R$ <?php echo number_format($diff, 2, ',', '.'); ?></h3>
@@ -314,7 +201,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
 
     <div class="row mb-4">
         <div class="col-md-6">
-            <div class="card" style="background-color:#dcfce7;border:none;">
+            <div class="card dashboard-card dashboard-card--paid">
                 <div class="card-body">
                     <h6>Total pago</h6>
                     <h3>R$ <?php echo number_format((float)($capitalIncrease['summary']['total_paid'] ?? 0), 2, ',', '.'); ?></h3>
@@ -322,7 +209,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card" style="background-color:#f3f4f6;border:none;">
+            <div class="card dashboard-card dashboard-card--neutral">
                 <div class="card-body">
                     <h6>Despesas confirmadas</h6>
                     <h3><?php echo (int)($capitalIncrease['summary']['count'] ?? 0); ?></h3>
@@ -335,7 +222,7 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
         <div class="row mb-4">
             <?php foreach ($capitalIncreaseYears as $year => $totalPaid): ?>
                 <div class="col-sm-6 col-lg-4 mb-3">
-                    <div class="card h-100" style="background-color:#dcfce7;border:none;">
+                    <div class="card dashboard-card dashboard-card--paid h-100">
                         <div class="card-body">
                             <h6>Ano <?php echo htmlspecialchars((string)$year); ?></h6>
                             <h3>R$ <?php echo number_format((float)$totalPaid, 2, ',', '.'); ?></h3>

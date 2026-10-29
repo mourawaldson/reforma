@@ -37,7 +37,7 @@ $chartValues = array_values($chartTotals);
 <!-- ========================= -->
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="card" style="background:#dcfce7;border:none;">
+        <div class="card dashboard-card dashboard-card--paid">
             <div class="card-body">
                 <h6>Total pago (confirmadas)</h6>
                 <h3>R$ <?= number_format($summary['total_paid'], 2, ',', '.') ?></h3>

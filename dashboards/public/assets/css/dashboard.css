@@ -51,3 +51,128 @@
 
 .dashboard-table tfoot th:first-child { border-bottom-left-radius: .45rem; }
 .dashboard-table tfoot th:last-child { border-bottom-right-radius: .45rem; }
+
+.dashboard-card {
+    border: 0;
+}
+
+.dashboard-card--pending { background-color: #fee2e2; }
+.dashboard-card--neutral { background-color: #f3f4f6; }
+.dashboard-card--invoice { background-color: #dbeafe; }
+.dashboard-card--paid { background-color: #dcfce7; }
+.dashboard-card--difference { background-color: #ede9fe; }
+.dashboard-card--attention { background-color: #fef9c3; }
+
+.dashboard-table--narrow {
+    max-width: 420px;
+}
+
+.dashboard-expenses {
+    font-size: .9rem;
+}
+
+.dashboard-expenses h1.h3 { font-size: 1.5rem; }
+.dashboard-expenses h2.h5 { font-size: 1.05rem; }
+.dashboard-expenses h3.h5 { font-size: 1rem; }
+.dashboard-expenses h3.h6 { font-size: .9rem; }
+
+.dashboard-expenses .card h3 {
+    font-size: 1.35rem;
+    margin-bottom: 0;
+}
+
+.dashboard-expenses .card h6 {
+    font-size: .85rem;
+}
+
+.dashboard-expenses .table-discounts th {
+    white-space: nowrap;
+    font-size: .85rem;
+}
+
+.dashboard-expenses .table-discounts td {
+    vertical-align: middle;
+}
+
+.dashboard-expenses .table-discounts .col-description {
+    max-width: 420px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard-expenses .table-discounts tfoot th {
+    font-weight: 600;
+}
+
+.dashboard-expenses .expenses-table-shell {
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    background-color: #f8f9fa;
+    overflow-x: auto;
+    overflow-y: hidden;
+    font-size: .8rem;
+}
+
+.dashboard-expenses .expenses-table-shell .table {
+    --bs-table-bg: transparent;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+}
+
+.dashboard-expenses .expenses-table-shell .table > :not(caption) > * > * {
+    padding: .35rem .5rem;
+}
+
+.dashboard-expenses .expenses-table-shell thead {
+    --bs-table-bg: #fff;
+    --bs-table-color: #6c757d;
+}
+
+.dashboard-expenses .expenses-table-shell thead th {
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.dashboard-expenses .expenses-table-shell tbody td {
+    background-color: #fff;
+}
+
+.dashboard-expenses .expenses-table-shell thead th:first-child { border-top-left-radius: .45rem; }
+.dashboard-expenses .expenses-table-shell thead th:last-child { border-top-right-radius: .45rem; }
+.dashboard-expenses .expenses-table-shell tfoot th:first-child { border-bottom-left-radius: .45rem; }
+.dashboard-expenses .expenses-table-shell tfoot th:last-child { border-bottom-right-radius: .45rem; }
+
+.dashboard-expenses .table-capital-increase .col-description {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-expenses .table-capital-increase .col-supplier {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-expenses .table-capital-increase {
+    width: 100%;
+    min-width: 760px;
+    table-layout: fixed;
+}
+
+.dashboard-expenses .table-capital-increase .col-date {
+    width: 11%;
+    white-space: nowrap;
+}
+.dashboard-expenses .table-capital-increase .col-supplier { width: 23%; }
+.dashboard-expenses .table-capital-increase .col-description { width: 48%; }
+
+.dashboard-expenses .table-capital-increase .col-paid {
+    width: 18%;
+    white-space: nowrap;
+}
+
+.dashboard-expenses .vet-value {
+    font-weight: 600;
+    color: #0f172a;
+}
