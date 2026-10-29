@@ -21,9 +21,9 @@
         const API_BASE = 'http://localhost:8000';
 
         function formatCurrencyBRFromNumber(num) {
-            if (num === null || num === undefined || num === '') return '';
+            if (num === null || num === undefined || num === '') return '-';
             const n = Number(num);
-            if (isNaN(n)) return '';
+            if (isNaN(n)) return '-';
             const fixed = n.toFixed(2);
             let [intPart, decPart] = fixed.split('.');
             intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -31,7 +31,7 @@
         }
 
         function formatDateBR(isoDate) {
-            if (!isoDate) return '';
+            if (!isoDate) return '-';
             const [y, m, d] = isoDate.split('-');
             return `${d}/${m}/${y}`;
         }
@@ -46,19 +46,20 @@
         });
 
         function renderDescriptionWithTags(e) {
-            const description = e.description || '';
+            const description = e.description || '-';
             const title = description.replace(/"/g, '&quot;');
 
-            const tagsHtml = (e.tags || []).map(function(t) {
+            const tags = (e.tags || []).filter(function(t) {
+                return t && t.name;
+            });
+            const tagsHtml = tags.map(function(t) {
                 return '<span class="badge bg-secondary me-1">' + t.name + '</span>';
             }).join('');
 
             let html = '';
             html += '<div class="descricao-coluna" title="' + title + '">' + description + '</div>';
 
-            if (tagsHtml) {
-                html += '<div class="small text-muted mt-1">' + tagsHtml + '</div>';
-            }
+            html += '<div class="small text-muted mt-1">' + (tagsHtml || '-') + '</div>';
 
             return html;
         }
@@ -105,8 +106,8 @@
                     let totalPendingPaid = 0;
 
                     pendingList.forEach(function(e) {
-                        totalPendingNf   += e.amount_nf !== null ? Number(e.amount_nf) : 0;
-                        totalPendingPaid += e.amount_paid !== null ? Number(e.amount_paid) : 0;
+                        totalPendingNf   += e.amount_nf !== null && e.amount_nf !== undefined && e.amount_nf !== '' ? Number(e.amount_nf) : 0;
+                        totalPendingPaid += e.amount_paid !== null && e.amount_paid !== undefined && e.amount_paid !== '' ? Number(e.amount_paid) : 0;
                     });
 
                     html += '<div class="card border-warning mb-4">';
@@ -126,10 +127,10 @@
                     pendingList.forEach(function(e) {
                         html += '<tr>';
                         html += '<td>' + formatDateBR(e.date) + '</td>';
-                        html += '<td>' + (e.supplier_name || '') + '</td>';
+                        html += '<td>' + (e.supplier_name || '-') + '</td>';
                         html += '<td>' + renderDescriptionWithTags(e) + '</td>';
                         html += '<td class="text-end">' +
-                            (e.amount_nf !== null ? formatCurrencyBRFromNumber(e.amount_nf) : '') +
+                            formatCurrencyBRFromNumber(e.amount_nf) +
                             '</td>';
                         html += '<td class="text-end">' +
                             formatCurrencyBRFromNumber(e.amount_paid) +
@@ -180,8 +181,8 @@
                     html += '</tr></thead><tbody>';
 
                     confirmed.forEach(function(e) {
-                        const nfVal   = e.amount_nf !== null ? Number(e.amount_nf) : 0;
-                        const paidVal = e.amount_paid !== null ? Number(e.amount_paid) : 0;
+                        const nfVal   = e.amount_nf !== null && e.amount_nf !== undefined && e.amount_nf !== '' ? Number(e.amount_nf) : 0;
+                        const paidVal = e.amount_paid !== null && e.amount_paid !== undefined && e.amount_paid !== '' ? Number(e.amount_paid) : 0;
 
                         totalNf   += nfVal;
                         totalPaid += paidVal;
@@ -192,10 +193,10 @@
 
                         html += '<tr class="' + rowClass + '">';
                         html += '<td>' + formatDateBR(e.date) + '</td>';
-                        html += '<td>' + (e.supplier_name || '') + '</td>';
+                        html += '<td>' + (e.supplier_name || '-') + '</td>';
                         html += '<td>' + renderDescriptionWithTags(e) + '</td>';
                         html += '<td class="text-end">' +
-                            (e.amount_nf !== null ? formatCurrencyBRFromNumber(e.amount_nf) : '') +
+                            formatCurrencyBRFromNumber(e.amount_nf) +
                             '</td>';
                         html += '<td class="text-end">' +
                             formatCurrencyBRFromNumber(e.amount_paid) +

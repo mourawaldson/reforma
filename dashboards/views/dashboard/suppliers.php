@@ -91,7 +91,14 @@ $chartValues = array_values($chartTotals);
 function formatCnpjCpf($value)
 {
   $CPF_LENGTH = 11;
+  if (!is_string($value) || trim($value) === '') {
+    return '-';
+  }
+
   $cnpj_cpf = preg_replace("/\D/", '', $value);
+  if ($cnpj_cpf === '') {
+    return '-';
+  }
   
   if (strlen($cnpj_cpf) === $CPF_LENGTH) {
     return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
@@ -121,8 +128,8 @@ function formatCnpjCpf($value)
             <?php if (!empty($suppliersNotUsed)): ?>
                 <?php foreach ($suppliersNotUsed as $supplier): ?>
                     <tr>
-                        <td><?= htmlspecialchars(formatCnpjCpf($supplier['cpf_cnpj'])) ?></td>
-                        <td><?= htmlspecialchars($supplier['name']) ?></td>
+                        <td><?= htmlspecialchars(formatCnpjCpf($supplier['cpf_cnpj'] ?? null)) ?></td>
+                        <td><?= htmlspecialchars($supplier['name'] ?? '-') ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

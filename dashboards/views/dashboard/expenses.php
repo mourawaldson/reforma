@@ -231,20 +231,20 @@ $overallDiff = $overallNf - $overallPaid;
             <tbody>
             <?php foreach ($discounts['items'] as $row): ?>
                 <tr>
-                    <td><?php echo date('d/m/Y', strtotime($row['date'])); ?></td>
-                    <td><?php echo htmlspecialchars($row['supplier_name']); ?></td>
+                    <td><?php echo !empty($row['date']) ? date('d/m/Y', strtotime($row['date'])) : '-'; ?></td>
+                    <td><?php echo htmlspecialchars($row['supplier_name'] ?? '-') ?: '-'; ?></td>
                     <td class="col-description"
-                        title="<?php echo htmlspecialchars($row['description']); ?>">
-                        <?php echo htmlspecialchars($row['description']); ?>
+                        title="<?php echo htmlspecialchars($row['description'] ?? '-'); ?>">
+                        <?php echo htmlspecialchars($row['description'] ?? '-') ?: '-'; ?>
                     </td>
                     <td class="text-end">
-                        R$ <?php echo number_format($row['amount_paid'], 2, ',', '.'); ?>
+                        <?php echo isset($row['amount_paid']) && $row['amount_paid'] !== '' ? 'R$ ' . number_format((float)$row['amount_paid'], 2, ',', '.') : '-'; ?>
                     </td>
                     <td class="text-end">
-                        R$ <?php echo number_format($row['additional_discount'], 2, ',', '.'); ?>
+                        <?php echo isset($row['additional_discount']) && $row['additional_discount'] !== '' ? 'R$ ' . number_format((float)$row['additional_discount'], 2, ',', '.') : '-'; ?>
                     </td>
                     <td class="text-end vet-value">
-                        R$ <?php echo number_format($row['vet'], 2, ',', '.'); ?>
+                        <?php echo isset($row['vet']) && $row['vet'] !== '' ? 'R$ ' . number_format((float)$row['vet'], 2, ',', '.') : '-'; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
