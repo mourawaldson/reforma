@@ -148,7 +148,6 @@ class DashboardController
             ],
             'capital_increase' => [
                 'summary' => [
-                    'count' => count($capitalIncreaseItems),
                     'total_paid' => $capitalIncreaseTotal,
                 ],
                 'years' => $capitalIncreaseYears,

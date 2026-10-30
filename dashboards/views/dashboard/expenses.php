@@ -10,7 +10,7 @@ $pending = $data['pending'] ?? [
 ];
 
 $capitalIncrease = $data['capital_increase'] ?? [
-        'summary' => ['count' => 0, 'total_paid' => 0],
+        'summary' => ['total_paid' => 0],
         'years' => [],
         'items' => [],
 ];
@@ -209,14 +209,6 @@ $capitalIncreaseChartValues = array_map('floatval', array_values($capitalIncreas
                 <div class="card-body">
                     <h6>Total pago</h6>
                     <h3><?php echo \Dashboard\Support\formatCurrencyBR($capitalIncrease['summary']['total_paid'] ?? 0); ?></h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card dashboard-card dashboard-card--neutral">
-                <div class="card-body">
-                    <h6>Despesas confirmadas</h6>
-                    <h3><?php echo (int)($capitalIncrease['summary']['count'] ?? 0); ?></h3>
                 </div>
             </div>
         </div>
