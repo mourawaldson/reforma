@@ -3,10 +3,10 @@ services:
     image: mysql:8.0
     container_name: reforma_db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: controle_reforma
-      MYSQL_USER: reforma
-      MYSQL_PASSWORD: reforma
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Defina MYSQL_ROOT_PASSWORD no arquivo .env}
+      MYSQL_DATABASE: ${DB_NAME:?Defina DB_NAME no arquivo .env}
+      MYSQL_USER: ${DB_USER:?Defina DB_USER no arquivo .env}
+      MYSQL_PASSWORD: ${DB_PASS:?Defina DB_PASS no arquivo .env}
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:3306:3306"
     volumes:
@@ -20,6 +20,14 @@ services:
     container_name: reforma_api
     depends_on:
       - db
+    environment:
+      APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
+      APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:?Defina DB_NAME no arquivo .env}
+      DB_USER: ${DB_USER:?Defina DB_USER no arquivo .env}
+      DB_PASS: ${DB_PASS:?Defina DB_PASS no arquivo .env}
+      DB_CHARSET: utf8mb4
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8000:80"
     volumes:
@@ -32,6 +40,9 @@ services:
     container_name: reforma_backoffice
     depends_on:
       - api
+    environment:
+      APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
+      APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8001:80"
     volumes:
@@ -44,6 +55,9 @@ services:
     container_name: reforma_dashboards
     depends_on:
       - api
+    environment:
+      APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
+      APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8002:80"
     volumes:
@@ -56,8 +70,8 @@ services:
       - db
     environment:
       PMA_HOST: db
-      PMA_USER: reforma
-      PMA_PASSWORD: reforma
+      PMA_USER: ${DB_USER:?Defina DB_USER no arquivo .env}
+      PMA_PASSWORD: ${DB_PASS:?Defina DB_PASS no arquivo .env}
       UPLOAD_LIMIT: 512M
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8080:80"

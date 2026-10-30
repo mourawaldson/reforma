@@ -15,6 +15,7 @@ class DashboardPageController
         $this->client = new Client([
             'base_uri' => $this->apiBaseUrl,
             'timeout'  => 5.0,
+            'auth'     => [getenv('APP_AUTH_USERNAME'), getenv('APP_AUTH_PASSWORD')],
         ]);
     }
 

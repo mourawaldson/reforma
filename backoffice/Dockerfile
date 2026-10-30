@@ -5,11 +5,12 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libzip-dev \
+    apache2-utils \
     && docker-php-ext-install zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Habilita mod_rewrite e aponta DocumentRoot para /public
-RUN a2enmod rewrite && \
+RUN a2enmod rewrite auth_basic authn_file authz_user && \
     sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf && \
     sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
