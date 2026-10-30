@@ -23,6 +23,15 @@
     });
 
     if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (window.__reformaServiceWorkerReloaded) {
+                return;
+            }
+
+            window.__reformaServiceWorkerReloaded = true;
+            window.location.reload();
+        });
+
         navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
             .catch(function (error) {
                 console.log('SW failed', error);
