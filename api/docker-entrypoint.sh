@@ -14,11 +14,10 @@ printf '%s\n' "$APP_AUTH_PASSWORD" | htpasswd -i -B -c /var/www/.htpasswd "$APP_
 chown root:www-data /var/www/.htpasswd
 chmod 640 /var/www/.htpasswd
 
-# Se tiver composer.json e ainda não existir vendor/autoload.php, roda o install
-# Instala dependências se composer.json existir
-if [ -f composer.json ]; then
+# Instala as dependências travadas somente quando ainda não existem.
+if [ -f composer.json ] && [ ! -f vendor/autoload.php ]; then
   echo ">> [api] Garantindo dependências do Composer..."
-  composer install --no-interaction --no-dev --prefer-dist || composer update --no-interaction --no-dev --prefer-dist
+  composer install --no-interaction --no-dev --prefer-dist
 fi
 
 echo ">> Iniciando Apache..."

@@ -8,7 +8,7 @@ header('Cache-Control: no-store, private');
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+$dotenv->safeLoad();
 
 require_once __DIR__ . '/../src/Auth.php';
 require_once __DIR__ . '/../src/Controllers/AuthController.php';
