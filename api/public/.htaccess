@@ -1,5 +1,5 @@
 AuthType Basic
-AuthName "Reforma"
+AuthName "Reforma Local"
 AuthUserFile /var/www/.htpasswd
 <LimitExcept OPTIONS>
     Require valid-user

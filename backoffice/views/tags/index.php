@@ -25,4 +25,4 @@
     </tr>
 </template>
 
-<script src="/assets/js/tags.js"></script>
+<script src="/assets/js/tags.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/tags.js'); ?>"></script>

@@ -36,4 +36,4 @@
 
 <script src="/assets/js/form-helpers.js"></script>
 
-<script src="/assets/js/supplier-form.js"></script>
+<script src="/assets/js/supplier-form.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/supplier-form.js'); ?>"></script>

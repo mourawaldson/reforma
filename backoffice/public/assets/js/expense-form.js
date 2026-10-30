@@ -1,5 +1,5 @@
 $(function() {
-        const API_BASE = 'http://localhost:8000';
+        const API_BASE = '/api-proxy';
         const id = $('#expense-id').val();
         const FH = window.FormHelpers;
 

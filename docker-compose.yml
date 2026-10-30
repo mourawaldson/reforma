@@ -43,6 +43,7 @@ services:
     environment:
       APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
       APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
+      API_INTERNAL_URL: http://api
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8001:80"
     volumes:

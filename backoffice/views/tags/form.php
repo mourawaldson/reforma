@@ -22,4 +22,4 @@
 
 <script src="/assets/js/form-helpers.js"></script>
 
-<script src="/assets/js/tag-form.js"></script>
+<script src="/assets/js/tag-form.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/tag-form.js'); ?>"></script>

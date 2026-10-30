@@ -63,4 +63,4 @@
 
 <script src="/assets/js/form-helpers.js"></script>
 
-<script src="/assets/js/expense-form.js"></script>
+<script src="/assets/js/expense-form.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/expense-form.js'); ?>"></script>

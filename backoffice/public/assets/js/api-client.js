@@ -1,6 +1,7 @@
-// Cross-origin API calls need browser credentials enabled for HTTP Basic Auth.
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
 $.ajaxSetup({
-    xhrFields: {
-        withCredentials: true
+    headers: {
+        'X-CSRF-Token': csrfToken
     }
 });

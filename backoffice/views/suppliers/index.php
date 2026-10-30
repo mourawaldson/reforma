@@ -28,4 +28,4 @@
     </tr>
 </template>
 
-<script src="/assets/js/suppliers.js"></script>
+<script src="/assets/js/suppliers.js?v=<?php echo filemtime(__DIR__ . '/../../public/assets/js/suppliers.js'); ?>"></script>

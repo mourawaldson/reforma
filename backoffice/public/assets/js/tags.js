@@ -1,5 +1,5 @@
 $(function () {
-    const API_BASE = 'http://localhost:8000';
+    const API_BASE = '/api-proxy';
     const $wrapper = $('#tags-table-wrapper');
     const $status = $('#tags-status');
     const tableTemplate = document.getElementById('tags-table-template');
