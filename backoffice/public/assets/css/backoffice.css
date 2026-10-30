@@ -38,6 +38,26 @@
     font-size: .85rem;
 }
 
+.container.mb-5 .backoffice-list {
+    width: 100%;
+}
+
+.container.mb-5 .backoffice-list--suppliers {
+    max-width: 760px;
+}
+
+.container.mb-5 .backoffice-list--tags {
+    max-width: 560px;
+}
+
+.container.mb-5 #suppliers-table-wrapper th:last-child,
+.container.mb-5 #suppliers-table-wrapper td:last-child,
+.container.mb-5 #tags-table-wrapper th:last-child,
+.container.mb-5 #tags-table-wrapper td:last-child {
+    width: 180px;
+    white-space: nowrap;
+}
+
 .container.mb-5 #expenses-table-wrapper .small .badge {
     font-size: .65rem;
 }
