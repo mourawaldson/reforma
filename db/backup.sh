@@ -1,77 +1,41 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
-########################################
-# Configurações
-########################################
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+BACKUP_DIR="${SCRIPT_DIR}/backups"
 
-CONTAINER_NAME="reforma_db"
-DB_NAME="controle_reforma"
-DB_USER="root"
-DB_PASS="root"
-BACKUP_DIR="./db/backups"
-
-# Ordem correta das tabelas (pais → filhos)
-TABLES_ORDER=("suppliers" "tags" "expenses" "expense_tags")
-
-########################################
-# Preparação
-########################################
-
+cd "$PROJECT_DIR"
 mkdir -p "$BACKUP_DIR"
 
-TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-RAW_FILE="${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}_raw.sql"
-OUT_FILE="${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql"
+TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
+BACKUP_FILE="${BACKUP_DIR}/controle_reforma_${TIMESTAMP}.sql"
+TEMP_FILE="${BACKUP_FILE}.tmp"
 
-echo "Gerando dump do banco '${DB_NAME}' a partir do container '${CONTAINER_NAME}'..."
-echo "Ordem das tabelas: ${TABLES_ORDER[*]}"
-echo "Arquivo bruto: $RAW_FILE"
+cleanup() {
+    rm -f -- "$TEMP_FILE"
+}
+trap cleanup EXIT
 
-########################################
-# 1) Dump bruto (estrutura + dados)
-#    - sem comments comuns
-#    - sem locks
-#    - single-transaction
-#    - TABELAS EM ORDEM EXPLÍCITA
-########################################
+if ! docker compose ps --status running --services | grep -Fxq db; then
+    echo "Erro: o serviço 'db' não está em execução. Inicie-o com 'docker compose up -d db'." >&2
+    exit 1
+fi
 
-docker exec "$CONTAINER_NAME" sh -c "
-  mysqldump \
-    --no-tablespaces \
-    --skip-comments \
-    --skip-add-locks \
-    --single-transaction \
-    -u${DB_USER} -p${DB_PASS} \
-    ${DB_NAME} ${TABLES_ORDER[*]}
-" > "$RAW_FILE"
+echo "Gerando backup do banco configurado no serviço 'db'..."
 
-echo "Dump bruto salvo em: $RAW_FILE"
-echo "Pós-processando (CREATE TABLE IF NOT EXISTS + limpeza de comentários + FK checks)..."
+# A senha é lida dentro do container, sem depender de uma senha fixa ou expô-la
+# na linha de comando deste host. O dump original é preservado para restauração.
+docker compose exec -T db sh -c \
+    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump --single-transaction --routines --triggers --events --hex-blob --no-tablespaces --databases "$MYSQL_DATABASE"' \
+    > "$TEMP_FILE"
 
-########################################
-# 2) Pós-processamento
-#    - Troca CREATE TABLE por CREATE TABLE IF NOT EXISTS
-#    - Remove comentários especiais de versão (linhas /*! ... */)
-#    - Envolve tudo com FOREIGN_KEY_CHECKS=0/1
-########################################
+if [[ ! -s "$TEMP_FILE" ]]; then
+    echo "Erro: o dump ficou vazio; nenhum backup foi criado." >&2
+    exit 1
+fi
 
-{
-  echo "SET FOREIGN_KEY_CHECKS=0;"
+mv -- "$TEMP_FILE" "$BACKUP_FILE"
+trap - EXIT
 
-  sed \
-    -e 's/CREATE TABLE `/CREATE TABLE IF NOT EXISTS `/' \
-    -e '/^\/\*!/d' \
-    "$RAW_FILE"
-
-  echo "SET FOREIGN_KEY_CHECKS=1;"
-} > "$OUT_FILE"
-
-########################################
-# 3) Limpeza
-########################################
-
-rm "$RAW_FILE"
-
-echo "Backup final gerado em: $OUT_FILE"
-echo "Concluído com sucesso."
+echo "Backup concluído: ${BACKUP_FILE}"

@@ -80,6 +80,16 @@ docker compose down
 
 Os dados ficam no volume Docker `db_data` e continuam lá após `stop`, `start` ou `down`. **Não use `docker compose down --volumes` para uma parada normal**: isso apaga o banco local. Os scripts em `sql/` são executados automaticamente apenas quando o volume é criado pela primeira vez; iniciar de novo não apaga nem recria um banco existente.
 
+## Fazer backup do banco
+
+Com o Docker Desktop aberto e o serviço `db` em execução, rode na raiz do projeto:
+
+```powershell
+& 'C:\Program Files\Git\bin\bash.exe' ./db/backup.sh
+```
+
+Também é possível abrir o Git Bash na pasta do projeto e executar `bash db/backup.sh`. O script usa o banco e a senha configurados no container, sem credenciais fixas no arquivo, e grava um dump SQL completo com data e hora em `db/backups/`. Ele informa erro se o banco não estiver ativo ou se o dump falhar. A pasta de backups é ignorada pelo Git.
+
 Para reconstruir as imagens depois de alterações no Dockerfile ou nas dependências:
 
 ```powershell
