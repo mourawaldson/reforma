@@ -22,12 +22,21 @@ if ! docker compose ps --status running --services | grep -Fxq db; then
     exit 1
 fi
 
-echo "Gerando backup do banco configurado no serviço 'db'..."
+DB_NAME="$(docker compose exec -T db printenv MYSQL_DATABASE | tr -d '\r')"
+if [[ ! "$DB_NAME" =~ ^[A-Za-z0-9_]+$ ]]; then
+    echo "Erro: MYSQL_DATABASE ausente ou contém caracteres não suportados." >&2
+    exit 1
+fi
+
+BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql"
+TEMP_FILE="${BACKUP_FILE}.tmp"
+
+echo "Gerando backup do banco '${DB_NAME}'..."
 
 # A senha é lida dentro do container, sem depender de uma senha fixa ou expô-la
 # na linha de comando deste host. O dump original é preservado para restauração.
 docker compose exec -T db sh -c \
-    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump --single-transaction --routines --triggers --events --hex-blob --no-tablespaces --databases "$MYSQL_DATABASE"' \
+    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump --single-transaction --routines --triggers --events --hex-blob --no-tablespaces "$MYSQL_DATABASE"' \
     > "$TEMP_FILE"
 
 if [[ ! -s "$TEMP_FILE" ]]; then

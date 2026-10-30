@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      DB_HOST: 127.0.0.1
+      DB_NAME: controle_reforma
+      DB_USER: reforma
+      DB_PASS: replace-with-a-unique-database-password
+      MYSQL_PWD: replace-with-a-unique-database-password
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_mysql, zip
+          coverage: none
+
+      - name: Check Compose and shell scripts
+        run: |
+          docker compose --env-file .env.example config --quiet
+          for script in db/*.sh; do bash -n "$script"; done
+
+      - name: Start disposable database
+        run: |
+          cp .env.example .env
+          docker compose up -d --wait db
+
+      - name: Apply and recheck migrations
+        run: |
+          bash db/migrate.sh
+          bash db/migrate.sh
+          bash db/test_migrations.sh
+
+      - name: Test backup and restore
+        run: |
+          bash db/backup.sh
+          backup_file="$(ls -t db/backups/*.sql | head -n 1)"
+          bash db/test_restore.sh "$backup_file"
+
+      - name: Install API dependencies
+        working-directory: api
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Check PHP syntax
+        run: |
+          git ls-files -z '*.php' | xargs -0 -n1 php -l
+
+      - name: Run API tests
+        working-directory: api
+        run: vendor/bin/phpunit
+
+      - name: Remove disposable database
+        if: always()
+        run: |
+          docker compose down --volumes || true
+          rm -f .env

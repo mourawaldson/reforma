@@ -1,0 +1,2 @@
+-- Baseline marker. New installations get the initial structure from sql/schema.sql.
+-- Keep this version so existing databases can record when migration tracking began.

@@ -12,6 +12,12 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_ROOT_PASSWORD}\" mysqladmin ping --host=127.0.0.1 --user=root --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
 
   api:
     build:
@@ -19,7 +25,8 @@ services:
       dockerfile: Dockerfile
     container_name: reforma_api
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
       APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
@@ -32,6 +39,12 @@ services:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8000:80"
     volumes:
       - ./api:/var/www/html
+    healthcheck:
+      test: ["CMD-SHELL", "php -r 'exit(@fsockopen(\"127.0.0.1\", 80) ? 0 : 1);'"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
 
   backoffice:
     build:
@@ -39,10 +52,12 @@ services:
       dockerfile: Dockerfile
     container_name: reforma_backoffice
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     environment:
       APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
       APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
       API_INTERNAL_URL: http://api
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8001:80"
@@ -55,10 +70,12 @@ services:
       dockerfile: Dockerfile
     container_name: reforma_dashboards
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     environment:
       APP_AUTH_USERNAME: ${APP_AUTH_USERNAME:?Defina APP_AUTH_USERNAME no arquivo .env}
       APP_AUTH_PASSWORD: ${APP_AUTH_PASSWORD:?Defina APP_AUTH_PASSWORD no arquivo .env}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
     ports:
       - "${HOST_BIND_ADDRESS:-127.0.0.1}:8002:80"
     volumes:
@@ -68,7 +85,8 @@ services:
     image: phpmyadmin/phpmyadmin:latest
     container_name: reforma_phpmyadmin
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       PMA_HOST: db
       PMA_USER: ${DB_USER:?Defina DB_USER no arquivo .env}

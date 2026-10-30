@@ -50,15 +50,25 @@ if ($uriPath === '/login') {
             exit;
         }
 
+        if (SessionAuth::isLoginThrottled()) {
+            http_response_code(429);
+            header('Retry-After: 900');
+            $errorMessage = 'Muitas tentativas. Aguarde 15 minutos antes de tentar novamente.';
+            include __DIR__ . '/../views/auth/login.php';
+            exit;
+        }
+
         $username = is_string($_POST['username'] ?? null) ? $_POST['username'] : '';
         $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
         if (!SessionAuth::login($username, $password)) {
+            SessionAuth::recordFailedLogin();
             http_response_code(401);
             $errorMessage = 'Usuário ou senha incorretos.';
             include __DIR__ . '/../views/auth/login.php';
             exit;
         }
 
+        SessionAuth::clearLoginThrottle();
         header('Location: /', true, 303);
         exit;
     }
